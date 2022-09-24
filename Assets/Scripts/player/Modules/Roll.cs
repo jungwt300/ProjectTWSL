@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Player.Modules.Characters;
+using Player.Modules.Characters;    //이거 있어야 PlayerControlelr 작동  
 
 namespace Player.Modules{
     public class Roll : MonoBehaviour{
@@ -10,48 +10,31 @@ namespace Player.Modules{
             BACKSTEP
         }
         private bool isRollOn = false;
-        public GameObject playerBody;
-        public Transform Cam;
         private PlayerController playerController;
         private CharacterController characterController;
         private Animator animator;
-        public Vector3 forwardDirection;
-        private Vector3 PrePosition;
         private Vector3 moveDir;
-        private float turnSmoothVelocity;
-        
         void Start() {
-            animator = GetComponentInChildren<Animator>();
+            animator = GameObject.Find("player").GetComponentInChildren<Animator>();
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
-            characterController = GetComponent<CharacterController>();
+            characterController = GameObject.Find("player").GetComponent<CharacterController>();
         }
-
         void Update() {
                 if(Input.GetKeyDown(KeyCode.Space)&&(isRollOn == false))
                 {
                     isRollOn = true;
                     setDodgeDirection();
                 }
-            
         }
-        
         private void setDodgeDirection(){
-            float horizontal = Input.GetAxisRaw("Horizontal");
-            float vertical = Input.GetAxisRaw("Vertical");
-
-            forwardDirection = new Vector3(horizontal, 0f, vertical).normalized;
-            if(forwardDirection.magnitude >= 0.1){
-                float targetAngle = Mathf.Atan2(forwardDirection.x , forwardDirection.z) * Mathf.Rad2Deg + Cam.eulerAngles.y;
-                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, 0.00f);
-                transform.rotation = Quaternion.Euler(0f,angle, 0f);
-                moveDir =Quaternion.Euler(0f,targetAngle,0f)*Vector3.forward;
-
-                GameObject.Find("player").GetComponent<PlayerController>().SetActiveState(PlayerController.eActiveState.ROLL);
-            
+            if(playerController.joystickDirection.magnitude >= 0.1){
+                playerController.SetActiveState(PlayerController.eActiveState.ROLL);
+                moveDir = playerController.GetPrimeDirection(1);
                 StartCoroutine(OnRoll(eRollType.ROLL));
             }
             else{
-                moveDir = Quaternion.Euler(0f, transform.eulerAngles.y , 0f) * Vector3.back;
+                playerController.SetActiveState(PlayerController.eActiveState.ROLL);
+                moveDir = playerController.GetObjectDirection(-1);
                 StartCoroutine(OnRoll(eRollType.BACKSTEP));
             }
         }
@@ -59,40 +42,36 @@ namespace Player.Modules{
             isRollOn = true;
             float elapsedTime = 0.0f;
             float duration = 0.7f;
-            float speed = 0.5f;
-            float range = 0.1f;
+            float force = 0.1f;
             switch (rollType){
                 case eRollType.ROLL:
                     Debug.Log("Dodge Roll");
+                    playerController.SetInputDirection();   //방향 재정의
                     animator.SetBool("isSlide", true);
                     duration = 0.6f;
-                    speed = 0.5f;
-                    range = 0.12f;
+                    force = 0.8f;
                     break;
                 case eRollType.BACKSTEP:
                     Debug.Log("Back Step");
                     animator.SetBool("isBackStep", true);
                     duration = 0.4f;
-                    speed = 0.7f;
-                    range = 0.08f;
+                    force = 0.6f;
                     break;
             }
-            Vector3 targetPosition = moveDir*range;
+            Vector3 targetPosition = (moveDir*0.05f)*force;
             Vector3 currentPosition = Vector3.zero;
                 while (elapsedTime < duration){
-                    Vector3 rollPosition = Vector3.Slerp(PrePosition, targetPosition, speed);
-                    characterController.Move(rollPosition);
+                    characterController.Move(targetPosition);
                     elapsedTime += Time.deltaTime;
-                    Debug.Log(elapsedTime);
                     yield return null;
                 }
-            //characterController.Move(targetPosition);
-            //GameObject.Find("player").GetComponent<PlayerController>().SetActiveState(PlayerController.eActiveState.DEFAULT);
             Debug.Log("Done");
             GameObject.Find("player").GetComponent<PlayerController>().SetActiveState(PlayerController.eActiveState.DEFAULT);
             animator.SetBool("isBackStep", false);
             animator.SetBool("isSlide", false);
             if(elapsedTime >= duration){
+                yield return new WaitForSeconds(0.2f);
+                Debug.Log("IsOllOn = false");
                 isRollOn = false;
             }
         }
