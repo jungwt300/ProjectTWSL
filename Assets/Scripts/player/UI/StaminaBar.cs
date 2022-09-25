@@ -2,17 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Player.Modules.Characters;
+
+namespace Player.Modules.UI{
 public class StaminaBar : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+        public Slider staminaSlider;
+        public CharacterStatus characterStatus;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void Start() 
+        {
+            characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
+            staminaSlider.minValue = 0;
+            staminaSlider.maxValue = characterStatus.GetMaxStamina();
+        }
+
+        private void Update() 
+        {
+            staminaSlider.value = characterStatus.GetCurrentStamina();
+        }
     }
 }

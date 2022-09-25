@@ -9,22 +9,30 @@ namespace Player.Modules{
             ROLL,
             BACKSTEP
         }
+        public float staminaUsage = 2f;
         private bool isRollOn = false;
         private PlayerController playerController;
         private CharacterController characterController;
+        private CharacterStatus characterStatus;
         private Animator animator;
         private Vector3 moveDir;
         void Start() {
             animator = GameObject.Find("player").GetComponentInChildren<Animator>();
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
+            characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
         }
         void Update() {
+            Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
+            if(characterStatus.GetCurrentStamina() > 0){
                 if(Input.GetKeyDown(KeyCode.Space)&&(isRollOn == false))
                 {
+                    characterStatus.ReduceStamina(staminaUsage);
                     isRollOn = true;
                     setDodgeDirection();
                 }
+            }
+
         }
         private void setDodgeDirection(){
             if(playerController.joystickDirection.magnitude >= 0.1){
