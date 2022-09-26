@@ -20,7 +20,8 @@ namespace Player.Modules.Characters
         public PlayerController playerController;
         private float stamina;
         private float health;
-        void Awake() {
+        void Awake()
+        {
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             max_health = 100.0f;
             health = max_health;
@@ -28,42 +29,52 @@ namespace Player.Modules.Characters
             stamina = max_stamina;
             staminaIncrement = 0.1f;
         }
-        void Update() {
-            if((playerController.GetActiveState() == PlayerController.eActiveState.DEFAULT) && (stamina <= max_stamina))
+        void Update()
+        {
+            if ((playerController.GetActiveState() == PlayerController.eActiveState.DEFAULT) && (stamina <= max_stamina))
             {
                 recoveryStamina(staminaIncrement);
             }
         }
 
-        private void recoveryStamina(float staminaIncrement){
+        private void recoveryStamina(float staminaIncrement)
+        {
             this.stamina += staminaIncrement;
-            stamina =Mathf.Clamp(stamina,-100f, max_stamina);
+            stamina = Mathf.Clamp(stamina, -100f, max_stamina);
         }
         //getter setter
         ///HP 관련
-        public float GetMaxHealth(){
+        public float GetMaxHealth()
+        {
             return this.max_health;
         }
-        public void SetMaxHealth(int health){
+        public void SetMaxHealth(int health)
+        {
             this.health = health;
         }
-        public float GetCurrentHealth(){
+        public float GetCurrentHealth()
+        {
             return this.health;
         }
-        public void TakeDamage(float value){
+        public void TakeDamage(float value)
+        {
             this.health -= value;
         }
-        public void HealHealth(float value){
+        public void HealHealth(float value)
+        {
             this.health += value;
         }
         ///스테미나 관련
-        public float GetMaxStamina(){
+        public float GetMaxStamina()
+        {
             return this.max_stamina;
         }
-        public float GetCurrentStamina(){
+        public float GetCurrentStamina()
+        {
             return stamina;
         }
-        public void ReduceStamina(float value){
+        public void ReduceStamina(float value)
+        {
             this.stamina -= value;
         }
     }

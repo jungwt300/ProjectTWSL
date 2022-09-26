@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Player.Modules.Characters;    //이거 있어야 PlayerControlelr 작동  
 
-namespace Player.Modules{
-    public class Roll : MonoBehaviour{
-        private enum eRollType{
+namespace Player.Modules
+{
+    public class Roll : MonoBehaviour
+    {
+        private enum eRollType
+        {
             ROLL,
             BACKSTEP
         }
@@ -16,16 +19,19 @@ namespace Player.Modules{
         private CharacterStatus characterStatus;
         private Animator animator;
         private Vector3 moveDir;
-        void Start() {
+        void Start()
+        {
             animator = GameObject.Find("player").GetComponentInChildren<Animator>();
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
         }
-        void Update() {
+        void Update()
+        {
             Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
-            if(characterStatus.GetCurrentStamina() > 0){
-                if(Input.GetKeyDown(KeyCode.Space)&&(isRollOn == false))
+            if (characterStatus.GetCurrentStamina() > 0)
+            {
+                if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
                 {
                     characterStatus.ReduceStamina(staminaUsage);
                     isRollOn = true;
@@ -34,24 +40,29 @@ namespace Player.Modules{
             }
 
         }
-        private void setDodgeDirection(){
-            if(playerController.joystickDirection.magnitude >= 0.1){
+        private void setDodgeDirection()
+        {
+            if (playerController.joystickDirection.magnitude >= 0.1)
+            {
                 playerController.SetActiveState(PlayerController.eActiveState.ROLL);
                 moveDir = playerController.GetPrimeDirection(1);
                 StartCoroutine(OnRoll(eRollType.ROLL));
             }
-            else{
+            else
+            {
                 playerController.SetActiveState(PlayerController.eActiveState.ROLL);
                 moveDir = playerController.GetObjectDirection(-1);
                 StartCoroutine(OnRoll(eRollType.BACKSTEP));
             }
         }
-        IEnumerator OnRoll(eRollType rollType){
+        IEnumerator OnRoll(eRollType rollType)
+        {
             isRollOn = true;
             float elapsedTime = 0.0f;
             float duration = 0.7f;
             float force = 0.1f;
-            switch (rollType){
+            switch (rollType)
+            {
                 case eRollType.ROLL:
                     Debug.Log("Dodge Roll");
                     playerController.SetInputDirection();   //방향 재정의
@@ -66,18 +77,20 @@ namespace Player.Modules{
                     force = 0.6f;
                     break;
             }
-            Vector3 targetPosition = (moveDir*0.05f)*force;
+            Vector3 targetPosition = (moveDir * 0.05f) * force;
             Vector3 currentPosition = Vector3.zero;
-                while (elapsedTime < duration){
-                    characterController.Move(targetPosition);
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
-                }
+            while (elapsedTime < duration)
+            {
+                characterController.Move(targetPosition);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
             Debug.Log("Done");
             GameObject.Find("player").GetComponent<PlayerController>().SetActiveState(PlayerController.eActiveState.DEFAULT);
             animator.SetBool("isBackStep", false);
             animator.SetBool("isSlide", false);
-            if(elapsedTime >= duration){
+            if (elapsedTime >= duration)
+            {
                 yield return new WaitForSeconds(0.2f);
                 Debug.Log("IsOllOn = false");
                 isRollOn = false;

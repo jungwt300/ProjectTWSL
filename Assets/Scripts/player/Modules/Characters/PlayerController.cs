@@ -6,7 +6,7 @@ namespace Player.Modules.Characters
 {
     public class PlayerController : MonoBehaviour
     {
-        public enum eDirection 
+        public enum eDirection
         {
             FRONT,
             BACK,
@@ -34,7 +34,7 @@ namespace Player.Modules.Characters
         public float turnSmoothVelocity;
         public float primeTargetAngle;
         CharacterController characterController;
-        CharacterStatus characterStatus;
+        //CharacterStatus characterStatus;
         Animator animator;
         [Header("Vector Value")]
         public Vector3 ObjectDirection;
@@ -45,7 +45,7 @@ namespace Player.Modules.Characters
         {
             characterController = GetComponent<CharacterController>();
             animator = GetComponentInChildren<Animator>();
-            characterStatus = GetComponent<CharacterStatus>();
+            //characterStatus = GetComponent<CharacterStatus>();
             ObjectDirection = Vector3.forward;
             PrimeDirection = Vector3.forward;
         }
@@ -99,6 +99,7 @@ namespace Player.Modules.Characters
         {
             return vectorValue;
         }
+
         public Vector3 GetObjectDirection(int direction)
         {   //현제 플레이어의 방향
             return this.ObjectDirection * direction;
@@ -119,7 +120,8 @@ namespace Player.Modules.Characters
         {   //현재 조작 상태
             this.activeState = activeState;
         }
-        public eActiveState GetActiveState(){
+        public eActiveState GetActiveState()
+        {
             return this.activeState;
         }
         private void debugRay()
