@@ -12,88 +12,106 @@ namespace Player.Modules
             ROLL,
             BACKSTEP
         }
-        public float staminaUsage = 2f;
-        private bool isRollOn = false;
+
+[Header("Config Parameter")]
+        public float staminaUsage;
+        public float duration;  //지속시간
+        public float afterDelay;    //후 딜레이
+        float force;
+[Header("Debug Value")]
         private PlayerController playerController;
-        private CharacterController characterController;
-        private CharacterStatus characterStatus;
+        private CharacterController characterController;    //루트모션 적용시 삭제 예정
+        private CharacterStatus characterStatus;    
         private Animator animator;
         private Vector3 moveDir;
+        public int actionParam = 0; // 0 = 구르기 , 1 = 백스텝
+        public bool isRollOn;
+        public float elapsedTime;   //경과시간
         void Start()
         {
             animator = GameObject.Find("player").GetComponentInChildren<Animator>();
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
+            isRollOn = false;
         }
         void Update()
         {
-            Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
-            if (characterStatus.GetCurrentStamina() > 0)
+//            Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
+            if (Input.GetKeyDown(KeyCode.Space) && (isRollOn ==false))
             {
-                if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
+                if ((characterStatus.GetCurrentStamina() > 0))
                 {
-                    characterStatus.ReduceStamina(staminaUsage);
-                    isRollOn = true;
-                    setDodgeDirection();
+                    Debug.Log("버튼 스페이스 입력");
+                    switch(playerController.GetActiveState()){
+                        case PlayerController.eActiveState.DEFAULT:
+                            setDodgeType();
+                            break;
+                        case PlayerController.eActiveState.DELAY_ATTACK:
+                            setDodgeType();
+                            break;
+                    }
                 }
             }
-
         }
-        private void setDodgeDirection()
+
+        private void setDodgeType()
         {
-            if (playerController.joystickDirection.magnitude >= 0.1)
+            if (playerController.joystickDirection.magnitude >= 0.1)    //이동중일때는 구르기
             {
                 playerController.SetActiveState(PlayerController.eActiveState.ROLL);
                 moveDir = playerController.GetPrimeDirection(1);
-                StartCoroutine(OnRoll(eRollType.ROLL));
+                StartCoroutine(OnEnter(0));
             }
             else
             {
-                playerController.SetActiveState(PlayerController.eActiveState.ROLL);
+                playerController.SetActiveState(PlayerController.eActiveState.ROLL);    //정지 상태는 백스텝
                 moveDir = playerController.GetObjectDirection(-1);
-                StartCoroutine(OnRoll(eRollType.BACKSTEP));
+                StartCoroutine(OnEnter(1));
             }
         }
-        IEnumerator OnRoll(eRollType rollType)
+        IEnumerator OnEnter(int actionParam)
         {
+            characterStatus.ReduceStamina(staminaUsage);
             isRollOn = true;
-            float elapsedTime = 0.0f;
-            float duration = 0.7f;
-            float force = 0.1f;
-            switch (rollType)
+            //afterDelay = 0.1f;
+            switch (actionParam)
             {
-                case eRollType.ROLL:
+                case 0:
                     Debug.Log("Dodge Roll");
                     playerController.SetInputDirection();   //방향 재정의
                     animator.SetBool("isSlide", true);
                     duration = 0.6f;
-                    force = 0.8f;
+                    force = 1f;
                     break;
-                case eRollType.BACKSTEP:
+                case 1:
                     Debug.Log("Back Step");
                     animator.SetBool("isBackStep", true);
                     duration = 0.4f;
-                    force = 0.6f;
-                    break;
+                    force = 0.8f;
+                    break;  
             }
             Vector3 targetPosition = (moveDir * 0.05f) * force;
             Vector3 currentPosition = Vector3.zero;
+            Debug.Log("구르기 실행");
             while (elapsedTime < duration)
-            {
+            {//선딜레이
                 characterController.Move(targetPosition);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
+            playerController.SetActiveState(PlayerController.eActiveState.DELAY_ATTACK);
+            elapsedTime = 0;
             Debug.Log("Done");
-            GameObject.Find("player").GetComponent<PlayerController>().SetActiveState(PlayerController.eActiveState.DEFAULT);
+            yield return new WaitForSeconds(0.1f);
+            isRollOn = false;
+            playerController.SetActiveState(PlayerController.eActiveState.DEFAULT);
             animator.SetBool("isBackStep", false);
             animator.SetBool("isSlide", false);
+            Debug.Log("IsRollOn = false");
             if (elapsedTime >= duration)
-            {
-                yield return new WaitForSeconds(0.2f);
-                Debug.Log("IsOllOn = false");
-                isRollOn = false;
+            {   //전환 딜레이
+                
             }
         }
     }
