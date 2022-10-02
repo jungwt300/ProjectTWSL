@@ -28,15 +28,28 @@ namespace Player.Modules
         }
         void Update()
         {
-            Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
+            // Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
             if (characterStatus.GetCurrentStamina() > 0)
             {
-                if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
+                if (characterController.isGrounded)     //땅에 있으면
                 {
-                    characterStatus.ReduceStamina(staminaUsage);
-                    isRollOn = true;
-                    setDodgeDirection();
+                    // if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
+                    if (Input.GetKeyDown(KeyCode.V) && (isRollOn == false))
+
+                    {
+                        characterStatus.ReduceStamina(staminaUsage);
+                        isRollOn = true;
+                        setDodgeDirection();
+                    }
                 }
+                // if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
+                // if (Input.GetKeyDown(KeyCode.V) && (isRollOn == false))
+
+                // {
+                //     characterStatus.ReduceStamina(staminaUsage);
+                //     isRollOn = true;
+                //     setDodgeDirection();
+                // }
             }
 
         }

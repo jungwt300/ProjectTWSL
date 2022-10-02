@@ -20,19 +20,26 @@ namespace Player.Modules.Characters
             DEFAULT,
             ROLL,
             ATTACK,
+            JUMP
         };
-        [Header("Config Parameter")]
+        [Header("Config Parameter")]    //이동
         [SerializeField] Transform playerBody;
         [SerializeField] Transform playerCamera;
 
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float friction = 10.0f;
         [SerializeField] float turnSmoothTime = 0.1f;
+        [SerializeField] private bool isJumping = false;
+        // [SerializeField] float gravity = -9.8f;
+
+        // float originalStepOffset = 0.0f;
+
         [Header("Debug Value")]
         public eActiveState activeState;
 
         public float turnSmoothVelocity;
         public float primeTargetAngle;
+        public bool isGrounded;
         CharacterController characterController;
         //CharacterStatus characterStatus;
         Animator animator;
@@ -41,6 +48,11 @@ namespace Player.Modules.Characters
         public Vector3 PrimeDirection;
         public Vector3 joystickDirection;
         public Vector3 currentPosition;
+        // public Vector3 moveDirection;
+        // public Vector3 jumpDirection;
+
+        // public Vector3 turnVelocity;
+        public Vector3 moveVelocity;
         void Start()
         {
             characterController = GetComponent<CharacterController>();
@@ -48,12 +60,17 @@ namespace Player.Modules.Characters
             //characterStatus = GetComponent<CharacterStatus>();
             ObjectDirection = Vector3.forward;
             PrimeDirection = Vector3.forward;
+
         }
         void Update()
         {
             debugRay();
             Move();
             AddGravity();
+            Jump();
+
+
+
         }
         private void Move()
         {
@@ -63,7 +80,10 @@ namespace Player.Modules.Characters
                 float horizontal = Input.GetAxisRaw("Horizontal");
                 float vertical = Input.GetAxisRaw("Vertical");
 
-                joystickDirection = new Vector3(horizontal, 0.0f, vertical).normalized;   //방향은 x y 의 입력값에 따라 정규화된 1 0 값을 반환한다.
+                // joystickDirection = transform.TransformDirection(joystickDirection);
+
+                // joystickDirection = new Vector3(horizontal, joystickDirection.y, vertical).normalized;   //방향은 x z 의 입력값에 따라 정규화된 1 0 값을 반환한다.
+                joystickDirection = new Vector3(horizontal, 0, vertical).normalized;   //방향은 x z 의 입력값에 따라 정규화된 1 0 값을 반환한다.
                 currentPosition = Vector3.Slerp(currentPosition, joystickDirection, Time.deltaTime * friction);    //선형 보간 으로 스칼라값 구한다.
                 //currentPosition = Vector3.Lerp(currentPosition, joystickDirection, Time.deltaTime * friction);   //선형 보간
                 float currentPositionScala = currentPosition.magnitude;
@@ -83,6 +103,7 @@ namespace Player.Modules.Characters
                 }
                 animator.SetFloat("Speed", currentPositionScala);
             }
+
         }
         //지역함수 , Getter Setter
         private float parseDot(float val)
@@ -124,6 +145,49 @@ namespace Player.Modules.Characters
         {
             return this.activeState;
         }
+        private void Jump()//eActiveState JUMP
+        {
+            // var horizontal = Input.GetAxisRaw("Horizontal");
+            var vertical = Input.GetAxisRaw("Vertical");         
+            // Vector3 StartJumpPos;
+            // Vector3 EndJumpPos;
+            // // jumpDirection = new Vector3(transform.position.x, transform.position.y, transform.position.z);  //jumpSpeed 만큼 올라감
+            // StartJumpPos = new Vector3(gameObject.transform.localPosition.x, gameObject.transform.position.y, gameObject.transform.localPosition.z); //jumpSpeed
+            // EndJumpPos = new Vector3(transform.localPosition.x, 4.0f, transform.localPosition.z); //
+
+            float jumpForce = 15.0f;
+            // float rotatioSpeed = 90;
+            // float speed = 3f;
+
+            if (characterController.isGrounded) //땅에 있으면
+            {
+                moveVelocity = transform.forward * vertical;
+                // moveVelocity = transform.forward * speed * vertical;
+                // turnVelocity = transform.up * rotatioSpeed * horizontal;
+
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    moveVelocity.y = jumpForce;
+
+                    // transform.position = Vector3.Lerp(transform.position, EndJumpPos, 1f);             
+                    isJumping = true;
+                    Debug.Log("isJumping = true");
+                    animator.SetBool("isJump", true);
+                    // SetActiveState(eActiveState.JUMP);
+                }
+                
+            isJumping = false;
+            Debug.Log("isJumping = false");
+            animator.SetBool("isJump", false);
+            // SetActiveState(eActiveState.DEFAULT);
+            }
+
+            moveVelocity.y += -StaticValues.GRAVITY_FORCE * Time.deltaTime;     //떨어지는 속력
+            characterController.Move(moveVelocity * Time.deltaTime);        //잘 모름
+            // transform.Rotate(turnVelocity * Time.deltaTime);
+
+        }
+
         private void debugRay()
         {
             Debug.DrawRay(playerBody.position, ObjectDirection, Color.red);
