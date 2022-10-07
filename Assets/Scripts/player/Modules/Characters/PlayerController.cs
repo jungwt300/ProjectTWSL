@@ -29,7 +29,7 @@ namespace Player.Modules.Characters
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float friction = 10.0f;
         [SerializeField] float turnSmoothTime = 0.1f;
-        [SerializeField] private bool isJumping = false;
+        [SerializeField] private bool isJumping;
         // [SerializeField] float gravity = -9.8f;
 
         // float originalStepOffset = 0.0f;
@@ -173,17 +173,24 @@ namespace Player.Modules.Characters
                     isJumping = true;
                     Debug.Log("isJumping = true");
                     animator.SetBool("isJump", true);
+                    if (characterController.isGrounded)
+                    animator.SetBool("isJump", false);
+                    
                     // SetActiveState(eActiveState.JUMP);
+                    
                 }
                 
-            isJumping = false;
             Debug.Log("isJumping = false");
-            animator.SetBool("isJump", false);
+            isJumping = false;
+
+            // animator.SetBool("isJump", false);
             // SetActiveState(eActiveState.DEFAULT);
+            // moveVelocity.y = 0f;
             }
 
             moveVelocity.y += -StaticValues.GRAVITY_FORCE * Time.deltaTime;     //떨어지는 속력
             characterController.Move(moveVelocity * Time.deltaTime);        //잘 모름
+
             // transform.Rotate(turnVelocity * Time.deltaTime);
 
         }

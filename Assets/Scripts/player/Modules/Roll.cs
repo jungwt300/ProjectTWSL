@@ -29,8 +29,8 @@ namespace Player.Modules
         void Update()
         {
             // Debug.Log(staminaUsage + "," + characterStatus.GetCurrentStamina());
-            if (characterStatus.GetCurrentStamina() > 0)
-            {
+            // if (characterStatus.GetCurrentStamina() > 0)
+            // {
                 if (characterController.isGrounded)     //땅에 있으면
                 {
                     // if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
@@ -50,7 +50,7 @@ namespace Player.Modules
                 //     isRollOn = true;
                 //     setDodgeDirection();
                 // }
-            }
+            // }
 
         }
         private void setDodgeDirection()
