@@ -81,8 +81,8 @@ namespace Player.Modules
                     Debug.Log("Dodge Roll");
                     playerController.SetInputDirection();   //방향 재정의
                     animator.SetBool("isSlide", true);
-                    duration = 0.6f;
-                    force = 1f;
+                    duration = 0.8f;
+                    force = 1.5f;
                     break;
                 case 1:
                     Debug.Log("Back Step");
@@ -103,7 +103,7 @@ namespace Player.Modules
             playerController.SetActiveState(PlayerController.eActiveState.DELAY_ATTACK);
             elapsedTime = 0;
             Debug.Log("Done");
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.0f);
             isRollOn = false;
             playerController.SetActiveState(PlayerController.eActiveState.DEFAULT);
             animator.SetBool("isBackStep", false);

@@ -10,7 +10,8 @@ namespace Player.Modules
         public enum eActionState{
             NONE = 0,
             DELAY_CASTING = 1,
-            DELAY_AFTER = 2
+            DELAY_AFTER = 2,
+            ROLL = 3
         }
         [Header("Config Parameter")]
         public float duration;  //지속시간
@@ -19,50 +20,58 @@ namespace Player.Modules
         public List<Animation> animations;
         [Header("Action State")]
         public eActionState currentActionState;
-        bool isCastingOn;
         bool isAfterDelayOn;
 
         public int actionParam;  // 0은 default
         public float elapsedTime;   //경과시간
         public bool isDelayCatchOn;
         public bool isAttackOn;
+        public bool isRollOn;
         private CharacterStatus characterStatus;
         private PlayerController playerController;
         private CharacterController characterController;
         private Animator animator;
-        Coroutine coroutine;
-
+        private Roll rollSkill;
         void Start(){
             animator = GameObject.Find("player").GetComponentInChildren<Animator>();
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
+            rollSkill = GameObject.Find("player").GetComponent<Roll>();
             actionParam = 0;
             currentActionState = eActionState.NONE;
             isDelayCatchOn = false;
             isAttackOn = false;
-            isCastingOn = false;
             isAfterDelayOn = false;
         }
         void Update() {
+
             if(Input.GetMouseButtonDown(0) && (this.isAttackOn == false)){
                 StartCoroutine(OnEnter());
             }
-            OnAction();
+            if(playerController.GetActiveState() != PlayerController.eActiveState.ROLL){
+                OnAction();
+            }
         }
         void OnAction(){
             switch(currentActionState){
                 case eActionState.NONE: //평상시
-                    if(Input.GetMouseButtonDown(0))
+                    if(Input.GetMouseButtonDown(0) && actionParam != 3)
                     {
                         this.isAttackOn = true;
                     }
                     break;
                 case eActionState.DELAY_CASTING://시전후
                     break;
+                case eActionState.ROLL:
+                    break;
                 case eActionState.DELAY_AFTER:
                     if(Input.GetMouseButtonDown(0)){
                         this.isAttackOn = true;
+                    }
+                    if(Input.GetKeyDown(KeyCode.Space)){
+                        this.isRollOn = true;
+                        this.SetActionState(eActionState.ROLL);
                     }
                     break;
             }
@@ -82,7 +91,6 @@ namespace Player.Modules
             playerController.SetActiveState(PlayerController.eActiveState.DELAY_ATTACK);
             isAttackOn = false;
             SetActionState(eActionState.DELAY_AFTER);
-            
             while(this.elapsedTime < this.afterDelay){
                 this.elapsedTime += Time.deltaTime;
                 if(this.isAttackOn == true){
@@ -90,9 +98,16 @@ namespace Player.Modules
                         SetActionState(eActionState.DELAY_CASTING);
                         this.elapsedTime = 0;
                         yield break;
-                    }
+                }
+                else if(this.isRollOn == true){
+                    Debug.Log("후딜레이 구르기로 캐치");
+                    SetActionState(eActionState.ROLL);
+                    this.elapsedTime = 0;
+                    yield break;
+
+                }
                 yield return null;
-            }
+            }  
                 yield return new WaitForSeconds(Time.deltaTime);
                 Debug.Log("후딜레이 끝");
                 playerController.SetActiveState(PlayerController.eActiveState.DEFAULT);
@@ -105,11 +120,19 @@ namespace Player.Modules
         public void PlayAttackAnimation(){
             switch(this.actionParam){
                 case 0:
-                    animator.SetInteger("attackCounter",0);
+                    animator.SetInteger("attackCounter", 0);
                     this.actionParam = 1;
                 break;
                 case 1:
                     animator.SetInteger("attackCounter", 1);
+                    this.actionParam = 2;
+                break;
+                case 2:
+                    animator.SetInteger("attackCounter", 2);
+                    this.actionParam = 3;
+                    break;
+                case 3:
+                    animator.SetInteger("attackCounter", 3);
                     this.actionParam = 0;
                 break;
             }
@@ -129,6 +152,12 @@ namespace Player.Modules
                     this.actionParam = 1;
                     break;
                 case 1:
+                    this.actionParam = 2;
+                    break;
+                case 2:
+                    this.actionParam = 3;
+                    break;
+                case 3:
                     this.actionParam = 0;
                     break;
             }

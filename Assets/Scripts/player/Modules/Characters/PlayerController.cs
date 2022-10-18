@@ -27,7 +27,6 @@ namespace Player.Modules.Characters
         {
             ATTACK,
             ROLL,
-
         }
         [Header("Config Parameter")]
         [SerializeField] Transform playerBody;
@@ -36,6 +35,8 @@ namespace Player.Modules.Characters
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float friction = 10.0f;
         [SerializeField] float turnSmoothTime = 0.1f;
+        [Header("INPUT Value")]
+
         [Header("Debug Value")]
         public eActiveState activeState;
 
@@ -49,6 +50,8 @@ namespace Player.Modules.Characters
         public Vector3 PrimeDirection;
         public Vector3 joystickDirection;
         public Vector3 currentPosition;
+        public Vector3 jumpDirection;
+        public Roll rollSkill;
         void Start()
         {
             characterController = GetComponent<CharacterController>();
@@ -71,7 +74,7 @@ namespace Player.Modules.Characters
 
             joystickDirection = new Vector3(horizontal, 0.0f, vertical).normalized;   //방향은 x y 의 입력값에 따라 정규화된 1 0 값을 반환한다.
             currentPosition = Vector3.Slerp(currentPosition, joystickDirection, Time.deltaTime * friction);    //선형 보간 으로 스칼라값 구한다.
-                                                                                                               //currentPosition = Vector3.Lerp(currentPosition, joystickDirection, Time.deltaTime * friction);   //선형 보간
+            //currentPosition = Vector3.Lerp(currentPosition, joystickDirection, Time.deltaTime * friction);   //선형 보간
             float currentPositionScala = currentPosition.magnitude;
             currentPositionScala = parseDot(currentPositionScala);
 
@@ -91,6 +94,11 @@ namespace Player.Modules.Characters
                 }
             }
             animator.SetFloat("Speed", currentPositionScala);
+        }
+        public void Jump(){
+            jumpDirection = new Vector3 (0.0f,1,0.0f);
+            float jumpForce = 0.3f;
+            characterController.Move(jumpDirection * jumpForce* Time.deltaTime);
         }
         //지역함수 , Getter Setter
         private float parseDot(float val)
