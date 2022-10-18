@@ -19,8 +19,15 @@ namespace Player.Modules.Characters
         {
             DEFAULT,
             ROLL,
+            DELAY_ROLL,
             ATTACK,
+            DELAY_ATTACK
         };
+        public enum eDelayState
+        {
+            ATTACK,
+            ROLL,
+        }
         [Header("Config Parameter")]
         [SerializeField] Transform playerBody;
         [SerializeField] Transform playerCamera;
@@ -28,6 +35,8 @@ namespace Player.Modules.Characters
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float friction = 10.0f;
         [SerializeField] float turnSmoothTime = 0.1f;
+        [Header("INPUT Value")]
+
         [Header("Debug Value")]
         public eActiveState activeState;
 
@@ -41,6 +50,8 @@ namespace Player.Modules.Characters
         public Vector3 PrimeDirection;
         public Vector3 joystickDirection;
         public Vector3 currentPosition;
+        public Vector3 jumpDirection;
+        public Roll rollSkill;
         void Start()
         {
             characterController = GetComponent<CharacterController>();
@@ -57,32 +68,37 @@ namespace Player.Modules.Characters
         }
         private void Move()
         {
-            if (activeState == eActiveState.DEFAULT)
-            {
-                //Debug.DrawRay(playerCamera.position, new Vector3(playerCamera.forward.x, 0f, playerCamera.forward.z).normalized, Color.red);
-                float horizontal = Input.GetAxisRaw("Horizontal");
-                float vertical = Input.GetAxisRaw("Vertical");
+            //Debug.DrawRay(playerCamera.position, new Vector3(playerCamera.forward.x, 0f, playerCamera.forward.z).normalized, Color.red);
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float vertical = Input.GetAxisRaw("Vertical");
 
-                joystickDirection = new Vector3(horizontal, 0.0f, vertical).normalized;   //방향은 x y 의 입력값에 따라 정규화된 1 0 값을 반환한다.
-                currentPosition = Vector3.Slerp(currentPosition, joystickDirection, Time.deltaTime * friction);    //선형 보간 으로 스칼라값 구한다.
-                //currentPosition = Vector3.Lerp(currentPosition, joystickDirection, Time.deltaTime * friction);   //선형 보간
-                float currentPositionScala = currentPosition.magnitude;
-                currentPositionScala = parseDot(currentPositionScala);
+            joystickDirection = new Vector3(horizontal, 0.0f, vertical).normalized;   //방향은 x y 의 입력값에 따라 정규화된 1 0 값을 반환한다.
+            currentPosition = Vector3.Slerp(currentPosition, joystickDirection, Time.deltaTime * friction);    //선형 보간 으로 스칼라값 구한다.
+            //currentPosition = Vector3.Lerp(currentPosition, joystickDirection, Time.deltaTime * friction);   //선형 보간
+            float currentPositionScala = currentPosition.magnitude;
+            currentPositionScala = parseDot(currentPositionScala);
 
-                //Debug.Log("Horizontal : " + horizontal +" vertical : "+ vertical);
-                //Debug.Log("joystickDirection.magnitude : " + joystickDirection.magnitude);  //joystickDirection Vector3 개체의 스칼라값.
-                if (currentPosition.magnitude >= 0.01f)
-                { //부동 소수점 주의!
-                    float targetAngle = Mathf.Atan2(currentPosition.x, currentPosition.z) * Mathf.Rad2Deg + playerCamera.eulerAngles.y; //카메라 기준 오브젝트 방향
-                    primeTargetAngle = Mathf.Atan2(joystickDirection.x, joystickDirection.z) * Mathf.Rad2Deg + playerCamera.eulerAngles.y; //플레이어 기준 인풋 방향
-                    PrimeDirection = Quaternion.Euler(0.0f, primeTargetAngle, 0.0f) * Vector3.forward;
-                    float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);   //플레이어 방향을 카메라 기준 방향으로 회전
-                    transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
-                    ObjectDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-                    characterController.Move(ObjectDirection.normalized * currentPositionScala * moveSpeed * Time.deltaTime);
+            //Debug.Log("Horizontal : " + horizontal +" vertical : "+ vertical);
+            //Debug.Log("joystickDirection.magnitude : " + joystickDirection.magnitude);  //joystickDirection Vector3 개체의 스칼라값.
+            if (currentPosition.magnitude >= 0.01f)
+            { //부동 소수점 주의!
+                float targetAngle = Mathf.Atan2(currentPosition.x, currentPosition.z) * Mathf.Rad2Deg + playerCamera.eulerAngles.y; //카메라 기준 오브젝트 방향
+                primeTargetAngle = Mathf.Atan2(joystickDirection.x, joystickDirection.z) * Mathf.Rad2Deg + playerCamera.eulerAngles.y; //플레이어 기준 인풋 방향
+                PrimeDirection = Quaternion.Euler(0.0f, primeTargetAngle, 0.0f) * Vector3.forward;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);   //플레이어 방향을 카메라 기준 방향으로 회전
+                if (activeState == eActiveState.DEFAULT)
+                {
+                transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                ObjectDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
+                characterController.Move(ObjectDirection.normalized * currentPositionScala * moveSpeed * Time.deltaTime);
                 }
-                animator.SetFloat("Speed", currentPositionScala);
             }
+            animator.SetFloat("Speed", currentPositionScala);
+        }
+        public void Jump(){
+            jumpDirection = new Vector3 (0.0f,1,0.0f);
+            float jumpForce = 0.3f;
+            characterController.Move(jumpDirection * jumpForce* Time.deltaTime);
         }
         //지역함수 , Getter Setter
         private float parseDot(float val)
