@@ -21,7 +21,7 @@ namespace Player.Modules.Characters
             ROLL,
             DELAY_ROLL,
             ATTACK,
-            DELAY_ATTACK
+            DELAY_ATTACK,
         };
         public enum eDelayState
         {
@@ -35,6 +35,8 @@ namespace Player.Modules.Characters
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float friction = 10.0f;
         [SerializeField] float turnSmoothTime = 0.1f;
+        public bool isAttackOn = false;
+        public bool isRollOn = false;
         [Header("INPUT Value")]
 
         [Header("Debug Value")]
@@ -43,7 +45,9 @@ namespace Player.Modules.Characters
         public float turnSmoothVelocity;
         public float primeTargetAngle;
         CharacterController characterController;
-        //CharacterStatus characterStatus;
+        Roll roll;
+        Attack attack;
+        CharacterStatus characterStatus;
         Animator animator;
         [Header("Vector Value")]
         public Vector3 ObjectDirection;
@@ -51,12 +55,13 @@ namespace Player.Modules.Characters
         public Vector3 joystickDirection;
         public Vector3 currentPosition;
         public Vector3 jumpDirection;
-        public Roll rollSkill;
         void Start()
         {
             characterController = GetComponent<CharacterController>();
             animator = GetComponentInChildren<Animator>();
-            //characterStatus = GetComponent<CharacterStatus>();
+            roll = GameObject.Find("player").GetComponent<Roll>();
+            attack = GameObject.Find("player").GetComponent<Attack>();
+            characterStatus = GetComponent<CharacterStatus>();
             ObjectDirection = Vector3.forward;
             PrimeDirection = Vector3.forward;
         }
@@ -65,6 +70,7 @@ namespace Player.Modules.Characters
             debugRay();
             Move();
             AddGravity();
+            AttackFront();
         }
         private void Move()
         {
@@ -100,6 +106,42 @@ namespace Player.Modules.Characters
             float jumpForce = 0.3f;
             characterController.Move(jumpDirection * jumpForce* Time.deltaTime);
         }
+        public void AttackFront(){
+            if(GetActiveState() ==eActiveState.DEFAULT || GetActiveState() == eActiveState.DELAY_ATTACK){
+                if (Input.GetMouseButtonDown(0) && (this.isAttackOn == false))
+                {
+                    SetActiveState(eActiveState.ATTACK);
+                    attack.StartCoroutine(attack.OnEnter());
+                }
+            }
+        }
+        public void rollDodge(){
+            if (Input.GetKeyDown(KeyCode.Space) && (isRollOn == false))
+            {
+                if ((characterStatus.GetCurrentStamina() > 0))
+                {
+                    Debug.Log("버튼 스페이스 입력");
+                    switch (GetActiveState())
+                    {
+                        case PlayerController.eActiveState.DEFAULT:
+                            roll.setDodgeType();
+                            //attack.SetActionParam(0);
+                            break;
+                        case PlayerController.eActiveState.DELAY_ATTACK:
+                            attack.SetActionParam(0);
+                            roll.setDodgeType();
+                            break;
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
         //지역함수 , Getter Setter
         private float parseDot(float val)
         {
