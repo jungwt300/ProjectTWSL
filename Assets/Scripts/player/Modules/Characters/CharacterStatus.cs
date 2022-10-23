@@ -10,7 +10,6 @@ namespace Player.Modules.Characters
         public float max_health;
         public float max_stamina;
         public float staminaIncrement;
-        public float movementSpeed;
         [Header("Status")]
         // public byte vitality;
         // public byte endurance;
@@ -23,17 +22,30 @@ namespace Player.Modules.Characters
         void Awake()
         {
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
-            max_health = 100.0f;
+            //max_health = 100.0f;
             health = max_health;
-            max_stamina = 100.0f;
+            //max_stamina = 100.0f;
             stamina = max_stamina;
-            staminaIncrement = 0.1f;
+            //staminaIncrement = 0.1f;
         }
         void Update()
         {
-            if ((playerController.GetActiveState() == PlayerController.eActiveState.DEFAULT) && (stamina <= max_stamina))
+            if (stamina <= max_stamina)
             {
-                recoveryStamina(staminaIncrement);
+                switch(playerController.GetActiveState()){
+                    case PlayerController.eActiveState.DEFAULT:
+                        recoveryStamina(staminaIncrement);
+                        break;
+                    case PlayerController.eActiveState.DELAY_ATTACK:
+                        recoveryStamina(staminaIncrement);
+                        break;
+                    case PlayerController.eActiveState.DELAY_ROLL:
+                        recoveryStamina(staminaIncrement);
+                        break;
+                    default:
+                        break;
+                }
+                
             }
         }
 
