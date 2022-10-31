@@ -26,6 +26,9 @@ namespace Player.Modules
         public bool isDelayCatchOn;
         public bool isAttackOn;
         public bool isRollOn;
+        public bool isHitboxOn;
+        public Transform targetBoss;
+        Collider swordHitbox;
         private CharacterStatus characterStatus;
         private PlayerController playerController;
         private CharacterController characterController;
@@ -37,11 +40,13 @@ namespace Player.Modules
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
             rollSkill = GameObject.Find("player").GetComponent<Roll>();
+            swordHitbox = GetComponent<Collider>();
             actionParam = 0;
             currentActionState = eActionState.NONE;
             isDelayCatchOn = false;
             isAttackOn = false;
             isAfterDelayOn = false;
+            isHitboxOn = false;
         }
         void Update() {
 
@@ -73,7 +78,7 @@ namespace Player.Modules
             float move_firstDelay = 0.2f;
             float move_secondDelay = 0.4f;
             Vector3 moveDir = transform.forward;
-            Vector3 targetPosition = (moveDir * 0.1f) * 0.9f;
+            Vector3 targetPosition = (moveDir * 0.1f) * 0.5f;
             //transform.rotation = Quaternion.Euler(0f, moveDir.y, 0f);  //방향 재정의
             switch (actionParam){
                 case 0 :
@@ -104,9 +109,12 @@ namespace Player.Modules
             while (elapsedTime < move_secondDelay)
             {//선딜레이
                 characterController.Move(targetPosition);
+                Vector3 dir = targetBoss.transform.position - this.transform.position;
+                this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 15f);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
+            isHitboxOn = true;
             //SetActionState(eActionState.DELAY_CASTING);
             yield return new WaitForSeconds(this.duration);
             Debug.Log("캐스팅 끝 후딜레이 시작");
@@ -114,6 +122,7 @@ namespace Player.Modules
             isAttackOn = false;
             playerController.isAttackOn = false;
             //SetActionState(eActionState.DELAY_AFTER);
+            isHitboxOn = false;
             while(this.elapsedTime < this.afterDelay){
                 this.elapsedTime += Time.deltaTime;
                 if(playerController.isAttackOn == true||playerController.isRollOn == true){

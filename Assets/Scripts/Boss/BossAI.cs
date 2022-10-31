@@ -35,7 +35,7 @@ public class BossAI : MonoBehaviour
         }
         void MoveAround(){
             float targetAngle = Mathf.Atan2(this.transform.position.x, this.transform.position.z) * Mathf.Rad2Deg;
-            Vector3 objectLeft = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.left;
+            Vector3 objectLeft = Vector3.left;
             transform.Translate(objectLeft * Time.deltaTime);
             LookAt();
         }
