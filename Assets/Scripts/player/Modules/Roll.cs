@@ -95,7 +95,7 @@ namespace Player.Modules
                     force = 0.08f;
                     break;  
             }
-            Vector3 targetPosition = (moveDir * 1f) * force;
+            Vector3 targetPosition = (moveDir * 0.5f) * force;
             Vector3 currentPosition = Vector3.zero;
             animator.SetBool("isAttackOn", false);
             Debug.Log("구르기 실행");
