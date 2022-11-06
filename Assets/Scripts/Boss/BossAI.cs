@@ -60,10 +60,10 @@ namespace Boss.Modules
 
         public void LookAt()
         {
-            if (bossState != EBossState.IDLE)
-            {
+            // if (bossState != EBossState.IDLE)
+            // {
             transform.LookAt(player);
-            }
+            // }
         }
         public void Walk()
         {
@@ -76,13 +76,13 @@ namespace Boss.Modules
         }
         public void WalkAround()
         {
-            if (bossState == EBossState.WALK)
-            {
+            // if (bossState == EBossState.WALK)
+            // {
                 float targetAngle = Mathf.Atan2(this.transform.position.x, this.transform.position.z) * Mathf.Rad2Deg;
                 Vector3 objectLeft = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.left;
                 transform.Translate(objectLeft * Time.deltaTime);
                 LookAt();
-            }
+            // }
 
         }
         public void Run()

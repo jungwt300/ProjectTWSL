@@ -28,22 +28,34 @@ public class BossController : MonoBehaviour
     public float runRange = 20.0f;   //추적 사거리
     public float attackRange = 5.0f;    //공격가능 사거리
     public float percentage = 0;        //공격 확률
+    public float rushPct = 0;       //돌진확률
     // public int rndPercentage = Random.Range(0,10);
     public float walkRange = 10.0f;      //추적 사거리
     float speed;        //Boss의 속도
+    public float bossHealth = 100.0f;   //Boss 체력
+    public float bossPower = 20.0f;   //Boss 공격력
 
     private bool isDead = false;    //생사 여부
     public bool isRushOn;
     public bool isWalkOn;
+    public int attacktype;
+    public bool isLookAt;
+    public bool isToFollow;
+
+    // eActiveState playerActive;
 
     // Start is called before the first frame update
     void Start()
     {
+        //boss
         _transform = this.gameObject.GetComponent<Transform>();
         playerTransform = GameObject.FindWithTag("Player").GetComponent<Transform>();
 
         navMeshAgent = this.gameObject.GetComponent<NavMeshAgent>();
-        animator = this.gameObject.GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
+
+        //player 
+        // playerActive = GameObject.Find("player").GetComponent<eActiveState>();
 
         StartCoroutine(this.CheckState());
         StartCoroutine(this.CheckStateForAction());
@@ -52,7 +64,27 @@ public class BossController : MonoBehaviour
     }
     void Update()
     {
-        LookAt();
+        if (isLookAt == true)
+        {
+            // LookAt();
+            FollowTarget();
+
+        }
+
+        if (isToFollow == true)
+        {
+            navMeshAgent.destination = playerTransform.position;
+        }
+        // FollowTarget();
+        // LookAt();
+        // if (range >= attackRange && range <= walkRange)
+        // {
+        //     navMeshAgent.speed = 5.0f;
+        //     // WalkAround();
+        // }
+        // WalkAround();
+        // pathFinder.enabled = false;
+        // NavMeshAgent.stop;
     }
     IEnumerator CheckState()        //boss의 조건
     {
@@ -69,7 +101,6 @@ public class BossController : MonoBehaviour
             {
                 currentState = CurrentState.WALK;
             }
-
             else if (range <= runRange)
             {
                 currentState = CurrentState.RUN;
@@ -87,20 +118,63 @@ public class BossController : MonoBehaviour
             switch (currentState)
             {
                 case CurrentState.IDLE:
-
+                    // IsIdle();
                     break;
 
                 case CurrentState.RUN:
-
                     IsRun();
+                    isLookAt = true;
                     break;
 
                 case CurrentState.ATTACK:
+                    if (percentage >= 10)
+                    {
+                        attacktype = 0;
+                        animator.SetBool("isAttack", false);
+
+                        //     // isAttackOn = true;
+                        //     // yield return new WaitForSeconds(delayTime);
+                        //     // isAttackOn = false;
+                        if (currentState == CurrentState.ATTACK)
+                        {
+                            isAttack();
+
+                            isLookAt = false;
+                            attackRange = 50.0f;
+                            yield return new WaitForSeconds(1.0f);
+                            attackRange = 5.0f;
+                            isLookAt = true;
+
+
+                            //     isAttackOn = true;
+                            //     yield return new WaitForSeconds(delayTime);
+                            //     isAttackOn = false;
+                        }
+                    }
+
+
+                    // if (percentage >= 10 && currentState == CurrentState.ATTACK)
+                    // {
+                    // switch (attacktype)
+                    // {
+                    //     case 0:
+                    //         Debug.Log("Attack");
+                    //         animator.SetBool("isAttack", false);
+
+                    //         break;
+                    //     case 1:
+                    //         Debug.Log("Attack2");
+                    //         animator.SetBool("isAttack", false);
+                    //         yield return new WaitForSeconds(1f);
+                    //         animator.SetBool("isAttack2", false);
+
+                    //         break;
+                    // }
 
                     break;
 
                 case CurrentState.WALK:
-
+                    isLookAt = true;
                     IsWalk();
                     break;
 
@@ -114,18 +188,26 @@ public class BossController : MonoBehaviour
     IEnumerator CountTime(float delayTime)  //ATTACK 확률 계산
     {
         int rndPercentage = Random.Range(1, 10);     //1~9 더함
+                                                     // if (percentage >= 10 && percentage <= 12)
 
+        if (rushPct >= 10)
+        {
+            rushPct = 0;
+            // yield return new WaitForSeconds(delayTime);
+        }
         if (percentage >= 10)
         {
             percentage = 0;
-            if (currentState == CurrentState.ATTACK)
-            {
-                isAttack();
-            }
+            yield return new WaitForSeconds(delayTime);
+            // attackRange = 5.0f;
+            // attacktype = 0;
+
         }
+
         // Debug.Log("Time : " + Time.time);
-        Debug.Log("Percentage : " + percentage + "0 % ");
+        // Debug.Log("Percentage : " + percentage + "0 % ");
         percentage += rndPercentage;        //percentage = percentage + rndPercentage;
+        rushPct += 1;
         yield return new WaitForSeconds(delayTime);
         StartCoroutine("CountTime", 1);
     }
@@ -138,24 +220,66 @@ public class BossController : MonoBehaviour
     }
     private void IsIdle()
     {
-
+        // animator.SetBool("isIdle",true);
     }
 
     private void isAttack()
     {
         Debug.Log("BOSS = ATTACK");
+        animator.SetBool("isAttack", true);
+
+        navMeshAgent.speed = 0.0f;
+        isToFollow = false;
+
+        // if (GameObject.Find("player").GetComponent<PlayerController>)   //플레이어가 ROLL이 아니면 
+        // {
+        //     // playerHealth -= Damage;
+        // }
     }
 
     private void IsWalk()
     {
-        Debug.Log("Walking");
         navMeshAgent.speed = 2.5f;
-        navMeshAgent.destination = playerTransform.position;
+        isToFollow = true;
+        // navMeshAgent.destination = playerTransform.position;
+        animator.SetBool("isRun", true);
+
+        // else
+        // {
+        //     navMeshAgent.speed = 2.5f;
+        //     navMeshAgent.destination = playerTransform.position;
+        //     // navMeshAgent.destination = playerTransform.position;
+        //     // WalkAround();
+        // }
+
     }
+    // public void WalkAround()
+    // {
+    //     if (currentState == CurrentState.WALK)
+    //     {
+    //         Debug.Log("Boss = WalkAround");
+    //         float targetAngle = Mathf.Atan2(this.transform.position.x, this.transform.position.z) * Mathf.Rad2Deg;
+    //         Vector3 objectLeft = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.left;
+    //         transform.Translate(objectLeft * Time.deltaTime);
+    //         LookAt();
+    //     }
+
+    // }
     private void IsRun()
     {
+        isToFollow = true;
         navMeshAgent.speed = 5f;
-        navMeshAgent.destination = playerTransform.position;
+
+        animator.SetBool("isRun", true);
+        // navMeshAgent.destination = playerTransform.position;
+    }
+    void FollowTarget()
+    {
+        if (playerTransform != null)
+        {
+            Vector3 dir = playerTransform.transform.position - this.transform.position;
+            this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 3);
+        }
     }
 
 }

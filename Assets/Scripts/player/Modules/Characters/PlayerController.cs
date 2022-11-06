@@ -31,12 +31,16 @@ namespace Player.Modules.Characters
         [Header("Config Parameter")]
         [SerializeField] Transform playerBody;
         [SerializeField] Transform playerCamera;
+        // [SerializeField] CinemachineFreeLook cinemachineFreeLook;
+        [SerializeField] Transform targetBoss;
 
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float friction = 10.0f;
         [SerializeField] float turnSmoothTime = 0.1f;
         public bool isAttackOn = false;
         public bool isRollOn = false;
+        public bool isLockOn = false;
+
         [Header("INPUT Value")]
 
         [Header("Debug Value")]
@@ -71,6 +75,8 @@ namespace Player.Modules.Characters
             Move();
             AddGravity();
             AttackFront();
+            LockOnTarget();
+
         }
         private void Move()
         {
@@ -100,6 +106,20 @@ namespace Player.Modules.Characters
                 }
             }
             animator.SetFloat("Speed", currentPositionScala);
+        }
+        private void LockOnTarget(){
+            if (Input.GetMouseButtonDown(2)){
+                switch(isLockOn){
+                    case false:
+                        this.isLockOn = true;
+                        Debug.Log("LockOn Target");
+                        break;
+                    case true:
+                        this.isLockOn = false;
+                        Debug.Log("LockOn Off");
+                        break;
+                }
+            }
         }
         public void Jump(){
             jumpDirection = new Vector3 (0.0f,1,0.0f);
