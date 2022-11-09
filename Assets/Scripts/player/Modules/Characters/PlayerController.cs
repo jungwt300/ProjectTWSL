@@ -71,7 +71,7 @@ namespace Player.Modules.Characters
             PrimeDirection = Vector3.forward;
             // pivotPoint = playerCamera.transform.position;
         }
-        void Update()
+        void FixedUpdate()
         {
             debugRay();
             Move();
@@ -89,10 +89,6 @@ namespace Player.Modules.Characters
             //currentPosition = Vector3.Lerp(currentPosition, joystickDirection, Time.deltaTime * friction);   //선형 보간
             float currentPositionScala = currentPosition.magnitude;
             currentPositionScala = parseDot(currentPositionScala);
-            if(isLockOn == true && activeState == eActiveState.DEFAULT){
-                Vector3 dir = targetBoss.transform.position - this.transform.position;
-                this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 10f);
-            }
             //Debug.Log("Horizontal : " + horizontal +" vertical : "+ vertical);
             //Debug.Log("joystickDirection.magnitude : " + joystickDirection.magnitude);  //joystickDirection Vector3 개체의 스칼라값.
             if (currentPosition.magnitude >= 0.01f)

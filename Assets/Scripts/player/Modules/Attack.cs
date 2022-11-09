@@ -28,7 +28,7 @@ namespace Player.Modules
         public bool isRollOn;
         public bool isHitboxOn;
         public Transform targetBoss;
-        Collider swordHitbox;
+        public Collider swordHitbox;
         private CharacterStatus characterStatus;
         private PlayerController playerController;
         private CharacterController characterController;
@@ -40,7 +40,7 @@ namespace Player.Modules
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
             rollSkill = GameObject.Find("player").GetComponent<Roll>();
-            swordHitbox = GetComponent<Collider>();
+            //swordHitbox = GetComponent<Collider>();
             actionParam = 0;
             currentActionState = eActionState.NONE;
             isDelayCatchOn = false;
@@ -167,6 +167,9 @@ namespace Player.Modules
                     this.actionParam = 0;
                 break;
             }
+        }
+        public bool GetStateHitboxOn(){
+            return this.isHitboxOn;
         }
         public void SetActionState(eActionState actionState){
             this.currentActionState = actionState;

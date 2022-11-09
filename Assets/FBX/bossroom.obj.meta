@@ -1,0 +1,185 @@
+fileFormatVersion: 2
+guid: 4fe074267f9ceeb4db0103eacdf953d7
+ModelImporter:
+  serializedVersion: 21202
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_Gler_1Mat
+    second: {fileID: 2100000, guid: 3d6bfc5bf3d6269459dba128dd960d9d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_Gler_2Mat
+    second: {fileID: 2100000, guid: 4e3cc9d9dcd16e648aae36c157086ff4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_Gler_3Mat
+    second: {fileID: 2100000, guid: 394819169a151f541a28328453c72eb3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_Gler_4Mat
+    second: {fileID: 2100000, guid: ca9766e63bcb43d47b6d8c92d0706496, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_Gler_5Mat
+    second: {fileID: 2100000, guid: 89fbc6babbac8bd41a3a3716cb5717b8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_Hle\xF0sla_2_brennt_2Mat"
+    second: {fileID: 2100000, guid: dceeee0636e585a4cbf731324a13e337, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_M\xE1lmurMat"
+    second: {fileID: 2100000, guid: 2d8c72b80e2d67b40a6ed9cce898684f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_Vi\xF0ur_1Mat"
+    second: {fileID: 2100000, guid: c42ad50e5f3302148b308b04876027dd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_[Tile_Ceramic_Multi]Mat
+    second: {fileID: 2100000, guid: c55624578f682874cabcac16f3f21fe3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001__14Mat
+    second: {fileID: 2100000, guid: 377b356677b7a6b408f40d6092e66dee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001__3Mat
+    second: {fileID: 2100000, guid: 1a0c05f0e692ad145abd4492ffd78d92, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_hle\xF0sla_2_brenntMat"
+    second: {fileID: 2100000, guid: 55b475f20306cce44be1af8d80bb1d22, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Component#142.006_Component#142.001_steinn1Mat
+    second: {fileID: 2100000, guid: 1c3e9ca1ca9c0464494ccfea48b3915a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_\xDEilMat"
+    second: {fileID: 2100000, guid: 89df260e5eafc774ea14fa7858c3be54, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_\xDEil_2Mat"
+    second: {fileID: 2100000, guid: 1bce19be6078a8241abcc2a933a36740, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "Component#142.006_Component#142.001_\xDEil_3Mat"
+    second: {fileID: 2100000, guid: a9f52ae725b2fea44b4c544dbbbba69c, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 1
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 1
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
