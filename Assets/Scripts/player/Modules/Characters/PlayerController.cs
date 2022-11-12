@@ -71,7 +71,7 @@ namespace Player.Modules.Characters
             PrimeDirection = Vector3.forward;
             // pivotPoint = playerCamera.transform.position;
         }
-        void FixedUpdate()
+        void Update()
         {
             debugRay();
             Move();

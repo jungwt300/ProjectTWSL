@@ -86,16 +86,16 @@ namespace Player.Modules
                     playerController.SetInputDirection();   //방향 재정의
                     animator.SetBool("isSlide", true);
                     duration = 0.8f;
-                    force = 0.1f;
+                    force = 5f;
                     break;
                 case 1:
                     Debug.Log("Back Step");
                     animator.SetBool("isBackStep", true);
                     duration = 0.4f;
-                    force = 0.08f;
+                    force = 3f;
                     break;  
             }
-            Vector3 targetPosition = (moveDir * 2f) * force;
+            Vector3 targetPosition = (moveDir) * force * Time.deltaTime;
             Vector3 currentPosition = Vector3.zero;
             animator.SetBool("isAttackOn", false);
             Debug.Log("구르기 실행");

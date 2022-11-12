@@ -7,12 +7,13 @@ namespace Player.Modules{
     {
         public bool hitAvailable;
         private Attack attack;
-
+        BossController controller;
         // Start is called before the first frame update
         void Start()
         {
             hitAvailable = true;
             attack = GameObject.Find("player").GetComponent<Attack>();
+            controller = GameObject.Find("boss").GetComponent<BossController>();
         }
 
         // Update is called once per frame
@@ -28,6 +29,7 @@ namespace Player.Modules{
                     if(hitAvailable == true){
                         Debug.Log("Weapons hitbox Hitted");
                         hitAvailable = false;
+                        controller.ReduceHP(45);
                     }
                 }
             }

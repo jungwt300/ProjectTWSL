@@ -78,7 +78,7 @@ namespace Player.Modules
             float move_firstDelay = 0.2f;
             float move_secondDelay = 0.4f;
             Vector3 moveDir = transform.forward;
-            Vector3 targetPosition = (moveDir * 0.1f) * 0.5f;
+            Vector3 targetPosition = moveDir * 2f *Time.deltaTime;
             //transform.rotation = Quaternion.Euler(0f, moveDir.y, 0f);  //방향 재정의
             switch (actionParam){
                 case 0 :

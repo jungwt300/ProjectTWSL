@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class BossController : MonoBehaviour
 {
+    public float hp = 1000;
+    public Slider bossHp;
     public enum CurrentState
     {
         IDLE,       //사거리에 player가 없는 상태
@@ -47,6 +50,8 @@ public class BossController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        bossHp.minValue = 0;
+        bossHp.maxValue = hp;
         //boss
         _transform = this.gameObject.GetComponent<Transform>();
         playerTransform = GameObject.FindWithTag("Player").GetComponent<Transform>();
@@ -57,13 +62,14 @@ public class BossController : MonoBehaviour
         //player 
         // playerActive = GameObject.Find("player").GetComponent<eActiveState>();
 
-        StartCoroutine(this.CheckState());
+        StartCoroutine(this.CheckState());  
         StartCoroutine(this.CheckStateForAction());
         StartCoroutine("CountTime", 1);
 
     }
     void Update()
     {
+        bossHp.value = hp;
         if (isLookAt == true)
         {
             // LookAt();
@@ -74,6 +80,10 @@ public class BossController : MonoBehaviour
         if (isToFollow == true)
         {
             navMeshAgent.destination = playerTransform.position;
+        }
+        if (hp <= 0)
+        {
+            isDead = true;
         }
         // FollowTarget();
         // LookAt();
@@ -239,10 +249,11 @@ public class BossController : MonoBehaviour
 
     private void IsWalk()
     {
-        navMeshAgent.speed = 3f;
+        navMeshAgent.speed = 1f;
         isToFollow = true;
         // navMeshAgent.destination = playerTransform.position;
-        animator.SetBool("isRun", true);
+        animator.SetBool("isWalk", true);
+        animator.SetBool("isRun", false);
 
         // else
         // {
@@ -269,7 +280,7 @@ public class BossController : MonoBehaviour
     {
         isToFollow = true;
         navMeshAgent.speed = 10f;
-
+        animator.SetBool("isWalk", false);
         animator.SetBool("isRun", true);
         // navMeshAgent.destination = playerTransform.position;
     }
@@ -281,5 +292,8 @@ public class BossController : MonoBehaviour
             this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 3);
         }
     }
-
+    public void ReduceHP(int damage)
+    {
+        this.hp -= damage;
+    }
 }
