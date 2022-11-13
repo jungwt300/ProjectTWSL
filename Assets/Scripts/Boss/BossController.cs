@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class BossController : MonoBehaviour
 {
+    public float hp = 1000;
     public float stamina = 100f;
     public float recoveryStamina =1f;
+    public Slider hpGauge;
     public enum CurrentState
     {
         IDLE,       //사거리에 player가 없는 상태
@@ -49,6 +52,7 @@ public class BossController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        hpGauge.maxValue = hp;
         //boss
         _transform = this.gameObject.GetComponent<Transform>();
         playerTransform = GameObject.FindWithTag("Player").GetComponent<Transform>();
@@ -62,10 +66,10 @@ public class BossController : MonoBehaviour
         StartCoroutine(this.CheckState());
         StartCoroutine(this.CheckStateForAction());
         StartCoroutine("CountTime", 1);
-
     }
     void Update()
     {
+        hpGauge.value = hp;
         Mathf.Clamp(stamina, 0, 100);
         if(currentState != CurrentState.RUN){
             stamina += recoveryStamina;
@@ -91,6 +95,10 @@ public class BossController : MonoBehaviour
         // WalkAround();
         // pathFinder.enabled = false;
         // NavMeshAgent.stop;
+    }
+    public void ReduceHp(int damage)
+    {
+        this.hp -= damage;
     }
     IEnumerator CheckState()        //boss의 조건
     {
@@ -232,25 +240,23 @@ public class BossController : MonoBehaviour
     private void isAttack()
     {
         Debug.Log("BOSS = ATTACK");
-        animator.SetBool("isAttack", true);
+        //animator.SetBool("isAttack", true);
 
         navMeshAgent.speed = 0.0f;
         isToFollow = false;
-
-        // if (GameObject.Find("player").GetComponent<PlayerController>)   //플레이어가 ROLL이 아니면 
-        // {
-        //     // playerHealth -= Damage;
-        // }
     }
+
     IEnumerator AttackType(int type){
         Debug.Log("AttackType 코루틴 실행");
+        yield return 0;
     }
     private void IsWalk()
     {
         navMeshAgent.speed = 2f;
         isToFollow = true;
         // navMeshAgent.destination = playerTransform.position;
-        animator.SetBool("isRun", true);
+        animator.SetBool("isWalk", true);
+        animator.SetBool("isRun", false);
 
         // else
         // {
@@ -276,9 +282,10 @@ public class BossController : MonoBehaviour
     private void IsRun()
     {
         isToFollow = true;
-        navMeshAgent.speed = 10f;
+        navMeshAgent.speed = 15f;
 
         animator.SetBool("isRun", true);
+        animator.SetBool("isWalk", false);
         // navMeshAgent.destination = playerTransform.position;
     }
     void FollowTarget()

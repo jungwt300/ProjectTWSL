@@ -29,7 +29,7 @@ namespace Player.Modules{
                     if(hitAvailable == true){
                         Debug.Log("Weapons hitbox Hitted");
                         hitAvailable = false;
-                        controller.ReduceHP(45);
+                        controller.ReduceHp(45);
                     }
                 }
             }

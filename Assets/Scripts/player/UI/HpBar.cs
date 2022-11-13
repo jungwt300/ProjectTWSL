@@ -15,7 +15,7 @@ namespace Player.UI{
         }
         private void Update()
         {
-            healthBar.value = bossController.hp;
+            //healthBar.value = bossController.hp;
         }
     }
 }

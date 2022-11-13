@@ -5,7 +5,7 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: -6865832974904590472
-    second: Armature|00-ALLACTION
+    second: 22-PoseRestr
   - first:
       74: 7579110541360102445
     second: Armature|01-TPOSE
@@ -153,6 +153,15 @@ ModelImporter:
   - first:
       74: 5795150803567405746
     second: 21-DIED
+  - first:
+      74: -6865832974904590472
+    second: Armature|00-ALLACTION
+  - first:
+      74: 4691015083660712215
+    second: 22-PoseRest
+  - first:
+      74: -7097258003412194478
+    second: 23-Dead
   externalObjects:
   - first:
       type: UnityEngine:Material
@@ -196,8 +205,8 @@ ModelImporter:
       name: Armature|00-ALLACTION
       takeName: Armature|00-ALLACTION
       internalID: 0
-      firstFrame: 0
-      lastFrame: 33
+      firstFrame: 30.6
+      lastFrame: 30.6
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -836,6 +845,64 @@ ModelImporter:
       internalID: 0
       firstFrame: 28.23
       lastFrame: 32.46
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: 22-PoseRest
+      takeName: Armature|00-ALLACTION
+      internalID: 0
+      firstFrame: 30.7
+      lastFrame: 30.7
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: 23-Dead
+      takeName: Armature|00-ALLACTION
+      internalID: 0
+      firstFrame: 32.3
+      lastFrame: 32.4
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
