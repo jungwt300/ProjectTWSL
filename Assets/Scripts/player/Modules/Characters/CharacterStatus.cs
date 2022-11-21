@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 namespace Player.Modules.Characters
 {
     public class CharacterStatus : MonoBehaviour
@@ -19,8 +19,12 @@ namespace Player.Modules.Characters
         public PlayerController playerController;
         private float stamina;
         private float health;
+        [SerializeField] Slider hpBar;
+        [SerializeField] Slider staminaBar;
         void Awake()
         {
+            staminaBar.maxValue = max_stamina;
+            hpBar.maxValue = max_health;
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             //max_health = 100.0f;
             health = max_health;
@@ -30,6 +34,8 @@ namespace Player.Modules.Characters
         }
         void Update()
         {
+            staminaBar.value = stamina;
+            hpBar.value = health;
             if (stamina <= max_stamina)
             {
                 switch(playerController.GetActiveState()){

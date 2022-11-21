@@ -21,6 +21,7 @@ namespace Player.Modules
 [Header("Debug Value")]
         private PlayerController playerController;
         private CharacterController characterController;    //루트모션 적용시 삭제 예정
+        private Attack attack;
         private CharacterStatus characterStatus;    
         private Animator animator;
         private Vector3 moveDir;
@@ -33,6 +34,7 @@ namespace Player.Modules
             playerController = GameObject.Find("player").GetComponent<PlayerController>();
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
+            attack = GameObject.Find("player").GetComponent<Attack>();
             isRollOn = false;
         }
         void Update()
@@ -55,7 +57,7 @@ namespace Player.Modules
             }
         }
 
-        private void setDodgeType()
+        public void setDodgeType()
         {
             if (playerController.joystickDirection.magnitude >= 0.1)    //이동중일때는 구르기
             {
@@ -73,7 +75,9 @@ namespace Player.Modules
         IEnumerator OnEnter(int actionParam)
         {
             characterStatus.ReduceStamina(staminaUsage);
+            attack.SetActionParam(0);
             isRollOn = true;
+            playerController.isRollOn = true;
             //afterDelay = 0.1f;
             switch (actionParam)
             {
@@ -82,17 +86,18 @@ namespace Player.Modules
                     playerController.SetInputDirection();   //방향 재정의
                     animator.SetBool("isSlide", true);
                     duration = 0.8f;
-                    force = 1.5f;
+                    force = 5f;
                     break;
                 case 1:
                     Debug.Log("Back Step");
                     animator.SetBool("isBackStep", true);
                     duration = 0.4f;
-                    force = 0.8f;
+                    force = 3f;
                     break;  
             }
-            Vector3 targetPosition = (moveDir * 0.05f) * force;
+            Vector3 targetPosition = (moveDir) * force * Time.deltaTime;
             Vector3 currentPosition = Vector3.zero;
+            animator.SetBool("isAttackOn", false);
             Debug.Log("구르기 실행");
             while (elapsedTime < duration)
             {//선딜레이
@@ -105,6 +110,7 @@ namespace Player.Modules
             Debug.Log("Done");
             yield return new WaitForSeconds(0.0f);
             isRollOn = false;
+            playerController.isRollOn = false;
             playerController.SetActiveState(PlayerController.eActiveState.DEFAULT);
             animator.SetBool("isBackStep", false);
             animator.SetBool("isSlide", false);

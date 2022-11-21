@@ -2,183 +2,200 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
+using UnityEngine.UI;
 
 public class BossController : MonoBehaviour
 {
-    public enum CurrentState{
-        NONE,       //
+    public float hp = 1000;
+    public float stamina = 100f;
+    public float recoveryStamina = 1f;
+    public Slider hpGauge;
+    public enum CurrentState
+    {
         IDLE,       //사거리에 player가 없는 상태
-        TRACE,      //사거리 안에 player가 감지
+        WALK,       // 걷기
+        RUN,      // 뛰기
         ATTACK,     //attackRange 안에 player가 감지
-        RUSH,       // 돌진
-        DAMAGED,    // 피격판정
+        DAMAGED,    // 피격판정//////////////////////////////// 미구현
         DEAD        // 생사여부
     }
-    // public enum Pattern{
-    //     _NONE,
-    //     A, 
-    //     B, 
-    //     C   //RUSH
-    // }
-    // public List<string> GachaList = new List<string>(){
-    //     "ATTACK1",
-    //     "ATTACK2",
-    //     "RUSH"
-    // };
-    // public int RandomInt;
-    // public Pattern pattern;
     [SerializeField] float range;   //거리
     // [SerializeField] List<Pattern> bosspatterns;
     public CurrentState currentState = CurrentState.IDLE;
     // public Pattern pattern = Pattern._NONE;
 
-    private Transform _transform;       //Boss의 좌표값
-    public Transform playerTransform;      //player의 
+    private Transform boss;       //Boss의 좌표값
+    public Vector3 bossV;
+    [SerializeField] Transform player;      //player의 
+    // public Vector3 playerV;
+
     private NavMeshAgent navMeshAgent;      //이동 제어를 위한
-    public LayerMask whatIsTarget; // 추적 대상 레이어
     private Animator animator;
-    public GameObject target;
-    public Transform targetPosition ;
     // LineRenderer lr;
 
-    public float bossHealth = 100f;
-
-
-    public float tranceRange = 30.0f;   //추적 사거리
-    public float attackRange = 10f;    //공격 사거리
-    public float rushRange = 20.0f;      //돌진 사용 가능 사거리
+    public float runRange = 20.0f;   //추적 사거리
+    public float attackRange = 7.0f;    //공격가능 사거리
+    public float percentage = 0;        //공격 확률
+    // public float rushPct = 0;       //돌진확률
+    // public int rndPercentage = Random.Range(0,10);
+    public float walkRange = 10.0f;      //추적 사거리
+    float speed;        //Boss의 속도
+    public float bossHealth = 100.0f;   //Boss 체력
+    public float bossPower = 20.0f;   //Boss 공격력
 
     private bool isDead = false;    //생사 여부
+    public bool isRushOn;
+    public bool isWalkOn;
+    public int attacktype;
+    public bool isLookAt;
+    public bool isToFollow;
 
-    public int rushTarget = 0;
-    public bool _target = false;
-    public bool DamagedTarget = false;
-
+    // eActiveState playerActive;
 
     // Start is called before the first frame update
     void Start()
     {
-        _transform = this.gameObject.GetComponent<Transform>();
-        playerTransform = GameObject.FindWithTag("Player").GetComponent<Transform>();
-        
+        hpGauge.maxValue = hp;
+        //boss
+        boss = this.gameObject.GetComponent<Transform>();
+        bossV = this.gameObject.transform.localPosition;
+
+        player = GameObject.FindWithTag("Player").GetComponent<Transform>();
+        // playerV = GameObject.FindWithTag("Player").GetComponent<Vector3>();
+
         navMeshAgent = this.gameObject.GetComponent<NavMeshAgent>();
-        animator = this.gameObject.GetComponent<Animator>();
-        // lr = GetComponent<LineRenderer>();
+        animator = GetComponentInChildren<Animator>();
 
-        // navMeshAgent.destination =playerTransform.position;
 
+
+        //player 
+        // playerActive = GameObject.Find("player").GetComponent<eActiveState>();
 
         StartCoroutine(this.CheckState());
         StartCoroutine(this.CheckStateForAction());
+        StartCoroutine("CountTime", 1);
     }
-    IEnumerator CheckState()
+    void Update()
+    {
+        hpGauge.value = hp;
+        Mathf.Clamp(stamina, 0, 100);
+        if (currentState != CurrentState.RUN)
+        {
+            stamina += recoveryStamina;
+        }
+        if (isLookAt == true)
+        {
+            // LookAt();
+            FollowTarget();
+
+        }
+
+        if (isToFollow == true)
+        {
+            navMeshAgent.destination = player.position;
+            // animator.SetBool("isIDLE", true);
+        }
+        // FollowTarget();
+        // LookAt();
+        // if (range >= attackRange && range <= walkRange)
+        // {
+        //     navMeshAgent.speed = 5.0f;
+        //     // WalkAround();
+        // }
+        // WalkAround();
+        // pathFinder.enabled = false;
+        // NavMeshAgent.stop;
+    }
+    public void ReduceHp(int damage)
+    {
+        this.hp -= damage;
+    }
+    IEnumerator CheckState()        //boss의 조건
     {
         while (!isDead)     //Boss가 살아있으면
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(Time.deltaTime);    //프레임 단위로 체크를 함
+            range = Vector3.Distance(player.position, boss.position);    //range = player와 Boss의 거리
 
-            // float range = Vector3.Distance
-            range = Vector3.Distance
-            (playerTransform.position, _transform.position);    //range = player와 Boss의 거리
-
-            if (range <= attackRange)
-            {
-                currentState = CurrentState.ATTACK;
-                // rushTarget = 0;
-
-            }
-            // else if (range >= attackRange && range <= rushRange)
-            else if (range <= rushRange)
-            {
-                currentState = CurrentState.RUSH;
-            }
-            //     // currentState = CurrentState.RUSH;
-            //     rushTarget = 2;
-            //     // _target = true;
-            // }
-            // else if (currentState == CurrentState.TRACE && pattern == Pattern.A)
+            // if (range <= attackRange)       //공격이 가능한 사거리
             // {
-            //     currentState = CurrentState.RUSH;
-
+            //     currentState = CurrentState.ATTACK;
             // }
-            // else if (currentState == CurrentState.TRACE)
+            // else if (range <= walkRange)
             // {
-            //     if (Input.GetKeyDown(KeyCode.Alpha1))
-            //     {
-            //         currentState = CurrentState.RUSH;
-            //     }
+            //     currentState = CurrentState.WALK;
             // }
-            else if (range <= tranceRange)
-            {
-                currentState = CurrentState.TRACE;
-                // playerTarget = true;
-                // rushTarget = 1;
-                // _target = true;
+            // else if (range <= runRange)
+            // {
+            //     currentState = CurrentState.RUN;
+            // }
+            // else
+            // {
+            //     currentState = CurrentState.IDLE;
+            // }
 
+            // if (percentage == 0 && currentState == CurrentState.WALK && range <= attackRange)       //공격이 가능한 사거리
+            // {
+            //     currentState = CurrentState.ATTACK;
+            //     Debug.Log("Boss = ATTACK");
+            //     // yield return new WaitForSeconds(1.0f);
+
+            // }
+            if (currentState == CurrentState.ATTACK && percentage == 0)    //CurrentState.ATTACK 이면 1초 동안 유지
+            {
+                isLookAt = false;
+                isToFollow = false;
+                yield return new WaitForSeconds(1.0f);
+            }
+            if (range <= walkRange)
+            {
+                currentState = CurrentState.WALK;
+                // Debug.Log("Boss = WALK");
 
             }
-            
+            else if (range <= runRange)
+            {
+                currentState = CurrentState.RUN;
+                // Debug.Log("Boss = RUN");
+
+            }
             else
             {
                 currentState = CurrentState.IDLE;
-                rushTarget = 0;
-                _target = false;
+                // currentState = CurrentState.ATTACK;
+                // yield return new WaitForSeconds(1.0f);
+                
             }
         }
     }
-    IEnumerator CheckStateForAction()
+    IEnumerator CheckStateForAction()       //boss의 상태의 따른 동작 프레임 단위
     {
         while (!isDead)     //Boss가 살아있으면
         {
             switch (currentState)
             {
                 case CurrentState.IDLE:
-                Debug.Log("BOSS = IDLE");
-                // navMeshAgent.Stop;
-                // NavMeshAgent.stop;
-                // IsIdle();
-                // animator.SetBool("idle", true);
-                // _target = true;
+                    // IsIdle();
+                    break;
 
-                break;
-
-                case CurrentState.TRACE:
-                Debug.Log("BOSS = TRACE");
-                IsTrance();
-                // animator.SetBool("isTrance",true);
-
-                // navMeshAgent.Resume();
-                // _target = true;
-
-                break;
+                case CurrentState.RUN:
+                    IsRun();
+                    isLookAt = true;
+                    break;
 
                 case CurrentState.ATTACK:
-                Debug.Log("BOSS = ATTACK");
-                // yield return new WaitForSeconds(0.2f);
-                // animator.SetBool("isAttack",true);
-                // yield return new WaitForSeconds(0.2f);
-                isAttack();
+                    // if (percentage == 0)
+                    // {
 
+                    // }
+                    transform.position = Vector3.MoveTowards(boss.transform.position, player.transform.position, 0.05f);
+                    break;
 
-                break;
+                case CurrentState.WALK:
+                    isLookAt = true;
+                    IsWalk();
+                    break;
 
-                case CurrentState.RUSH:
-                Debug.Log("BOSS = RUSH");
-                // animator.SetBool("isRush",true);
-                // yield return new WaitForSeconds(0.5f);
-                // IsRush();
-                // yield return new WaitForSeconds(0.3f);
-                // currentState = CurrentState.IDLE;
-                // animator.SetBool("isRush",false);
-                // _target = true;
-                IsRush();
-
-                break;
-
-                case CurrentState.NONE:
-                // Stop();
-                break;
             }
 
             yield return null;
@@ -186,82 +203,129 @@ public class BossController : MonoBehaviour
         }
 
     }
+    IEnumerator CountTime(float delayTime)  //ATTACK 확률 계산
+    {
+        int rndPercentage = Random.Range(1, 10);     //1~9 더함
+                                                     // if (percentage >= 10 && percentage <= 12)
+
+        // if (rushPct >= 10)
+        // {
+        //     rushPct = 0;
+        //     // yield return new WaitForSeconds(delayTime);
+        // }
+        if (percentage >= 10 && range <= attackRange)   //percentage 가 10 이상, 거리가 7안에 있으면
+        {
+            percentage = 0;
+            
+            // attackRange = 5.0f;
+            // attacktype = 0;
+            // animator.SetBool("isRUN", true);
+            if (percentage == 0 && currentState == CurrentState.WALK)   //percentage == 0, boss가 WALK 상태일 때
+            {
+                isAttack();
+                currentState = CurrentState.ATTACK;
+            // yield return new WaitForSeconds(1.0f);
+
+            }
+        }
+
+        // Debug.Log("Time : " + Time.time);
+        // Debug.Log("Percentage : " + percentage + "0 % ");
+        if (currentState == CurrentState.WALK) //player 가 attackRange 안에 있을때만 올라감
+        {
+            percentage += rndPercentage;        //percentage = percentage + rndPercentage;
+
+        }
+        // else if (currentState == CurrentState.WALK)
+        // {
+        //     percentage += 0;
+        // }
+        // rushPct += 1;
+        yield return new WaitForSeconds(delayTime);
+        StartCoroutine("CountTime", 1);
+        // Vector3 player = new Vector3(player.transform.position);     //player 전 위치
+    }
+    public void LookAt()
+    {
+        if (currentState != CurrentState.IDLE)
+        {
+            transform.LookAt(player);
+        }
+    }
     private void IsIdle()
     {
-        animator.SetBool("idle", true);
-
-        _transform.position = Vector3.zero;
-        rushTarget = 0;
-        // _target = false;
-
-
-        // navMeshAgent.destination = playerTransform.position;    //player를 따라감
-
-
-        // if (target != null)
-        // {
-        //     // target = new target;
-        //     targetPosition = target.transform.position;
-
-        //     // currentState(CurrentState.IDLE);
-        // }
+        // animator.SetBool("isIDLE",true);
     }
 
     private void isAttack()
     {
-        // transform.position = Vector3.forward;
+        
+            Debug.Log("BOSS = ATTACK");
+            animator.SetBool("isATTACK", true);
+            animator.SetBool("isWALK", false);
+            animator.SetBool("isRUN", false);
 
-    }
-
-    private void IsRush()
-    {
-        // for ()
-        // {
-            // transform.position = Vector3.Slerp(gameObject.transform.position, targetPosition.transform.position, 1f);
-            // transform.position = Vector3.lerp(_transform.position, playerTransform.position, 0.03f);
-        // if (rushTarget ==2 && _target == true)
-        // if (_target == true)
-
-        // {
-	    //     transform.position = Vector3.Lerp(transform.position, playerTransform.position, Time.deltaTime * 1f);
-
-        // }
-	    transform.position = Vector3.Lerp(transform.position, playerTransform.position, Time.deltaTime * 1f);
-        Debug.Log("Rushing");
-        // }
-        // transform.position = Vector3.Slerp(transform.position, targetPosition.transform.position, 1f);
-    }
-    private void IsTrance()
-    {
-        // animator.SetBool("isTrance",true);
-
-        // playerTarget = true;
-        // if (rushTarget == 1 && _target == false)
-        // if (rushTarget == 0 && rushTarget == 2 && _target == false)
-
-        // {
-            navMeshAgent.destination = playerTransform.position;    //player를 따라감
-            // if (range >= rushRange)
-            // {
-            //     // _target = true;
-            // }
-        // }
-        // navMeshAgent.destination = playerTransform.position;    //player를 따라감
-        // if (currentState == CurrentState.TRACE)
-        // {
-
-        // }
-
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        targetPosition = playerTransform.transform;
-
-        if (currentState != CurrentState.RUSH)
-        {
+            // currentState = CurrentState.ATTACK;
             
+
+        
+
+        // animator.SetBool("isAttack", false);
+
+        // navMeshAgent.speed = 0.0f;
+    }
+
+    IEnumerator AttackType(int type)
+    {
+        Debug.Log("AttackType 코루틴 실행");
+        yield return 0;
+    }
+    private void IsWalk()
+    {
+        if (range <= 6 && range >= 8)
+        {
+            WalkAround();
+        }
+        Debug.Log("Boss = WALK");
+        navMeshAgent.speed = 2f;
+        isToFollow = true;
+        // navMeshAgent.destination = playerTransform.position;
+        animator.SetBool("isWALK", true);
+        animator.SetBool("isRUN", false);
+        animator.SetBool("isATTACK", false);
+        animator.SetBool("isIDLE", false);
+
+    }
+    public void WalkAround()
+    {
+        if (currentState == CurrentState.WALK)
+        {
+            Debug.Log("Boss = WalkAround");
+            float targetAngle = Mathf.Atan2(this.transform.position.x, this.transform.position.z) * Mathf.Rad2Deg;
+            Vector3 objectLeft = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.left;
+            transform.Translate(objectLeft * Time.deltaTime);
+            LookAt();
+            isToFollow = false;
+        }
+
+    }
+    private void IsRun()
+    {
+        Debug.Log("Boss = RUN");   
+        isToFollow = true;
+        navMeshAgent.speed = 15f;
+
+        animator.SetBool("isRUN", true);
+        animator.SetBool("isWALK", false);
+        // navMeshAgent.destination = playerTransform.position;
+    }
+    void FollowTarget()
+    {
+        if (player != null)
+        {
+            Vector3 dir = player.transform.position - this.transform.position;
+            this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 3);
         }
     }
+
 }

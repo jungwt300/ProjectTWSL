@@ -11,7 +11,6 @@ namespace Player.Modules
             NONE = 0,
             DELAY_CASTING = 1,
             DELAY_AFTER = 2,
-            ROLL = 3
         }
         [Header("Config Parameter")]
         public float duration;  //지속시간
@@ -27,6 +26,9 @@ namespace Player.Modules
         public bool isDelayCatchOn;
         public bool isAttackOn;
         public bool isRollOn;
+        public bool isHitboxOn;
+        public Transform targetBoss;
+        public Collider swordHitbox;
         private CharacterStatus characterStatus;
         private PlayerController playerController;
         private CharacterController characterController;
@@ -38,20 +40,16 @@ namespace Player.Modules
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
             rollSkill = GameObject.Find("player").GetComponent<Roll>();
+            //swordHitbox = GetComponent<Collider>();
             actionParam = 0;
             currentActionState = eActionState.NONE;
             isDelayCatchOn = false;
             isAttackOn = false;
             isAfterDelayOn = false;
+            isHitboxOn = false;
         }
         void Update() {
 
-            if(Input.GetMouseButtonDown(0) && (this.isAttackOn == false)){
-                StartCoroutine(OnEnter());
-            }
-            if(playerController.GetActiveState() != PlayerController.eActiveState.ROLL){
-                OnAction();
-            }
         }
         void OnAction(){
             switch(currentActionState){
@@ -63,56 +61,89 @@ namespace Player.Modules
                     break;
                 case eActionState.DELAY_CASTING://시전후
                     break;
-                case eActionState.ROLL:
-                    break;
                 case eActionState.DELAY_AFTER:
                     if(Input.GetMouseButtonDown(0)){
                         this.isAttackOn = true;
                     }
-                    if(Input.GetKeyDown(KeyCode.Space)){
-                        this.isRollOn = true;
-                        this.SetActionState(eActionState.ROLL);
-                    }
                     break;
             }
         }
-        IEnumerator OnEnter(){
+        public IEnumerator OnEnter(){
             characterStatus.ReduceStamina(staminaUsage);
             animator.SetBool("isAttackOn",true);
             this.isAttackOn = true;
+            playerController.isAttackOn = true;
             this.isDelayCatchOn = false;
             this.elapsedTime = 0.0f;
+            float move_firstDelay = 0.2f;
+            float move_secondDelay = 0.4f;
+            Vector3 moveDir = transform.forward;
+            Vector3 targetPosition = moveDir * 2f *Time.deltaTime;
+            //transform.rotation = Quaternion.Euler(0f, moveDir.y, 0f);  //방향 재정의
+            switch (actionParam){
+                case 0 :
+                    move_firstDelay = 0.2f;
+                    move_secondDelay = 0.4f;
+                    break;
+                case 1 :
+                    move_firstDelay = 0.14f;
+                    move_secondDelay = 0.4f;
+                    break;
+                case 2:
+                    move_firstDelay = 0.4f;
+                    move_secondDelay = 0.6f;
+                    break;
+                case 3:
+                    move_firstDelay = 0.1f;
+                    move_secondDelay = 0.6f;
+                    break;
+            }
+            
             Debug.Log("코루틴 시작 공격 애니메이션 재생");
             playerController.SetActiveState(PlayerController.eActiveState.ATTACK);
             PlayAttackAnimation();
-            SetActionState(eActionState.DELAY_CASTING);
+            while (elapsedTime < move_firstDelay){
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            while (elapsedTime < move_secondDelay)
+            {//선딜레이
+                characterController.Move(targetPosition);
+                Vector3 dir = targetBoss.transform.position - this.transform.position;
+                this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 15f);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            isHitboxOn = true;
+            //SetActionState(eActionState.DELAY_CASTING);
             yield return new WaitForSeconds(this.duration);
             Debug.Log("캐스팅 끝 후딜레이 시작");
             playerController.SetActiveState(PlayerController.eActiveState.DELAY_ATTACK);
             isAttackOn = false;
-            SetActionState(eActionState.DELAY_AFTER);
+            playerController.isAttackOn = false;
+            //SetActionState(eActionState.DELAY_AFTER);
+            isHitboxOn = false;
             while(this.elapsedTime < this.afterDelay){
                 this.elapsedTime += Time.deltaTime;
-                if(this.isAttackOn == true){
+                if(playerController.isAttackOn == true||playerController.isRollOn == true){
                         Debug.Log("후딜레이 캐치 새로운 코루틴 시작");
-                        SetActionState(eActionState.DELAY_CASTING);
+                        //animator.SetBool("isAttackOn", false);
+                        if(playerController.isRollOn == true){
+                        animator.SetBool("isSlide", true);
+                        Debug.Log("slideOnnnn");
+                        }
                         this.elapsedTime = 0;
                         yield break;
                 }
-                else if(this.isRollOn == true){
-                    Debug.Log("후딜레이 구르기로 캐치");
-                    SetActionState(eActionState.ROLL);
-                    this.elapsedTime = 0;
-                    yield break;
-
-                }
+                
                 yield return null;
             }  
+                SetActionParam(0);
                 yield return new WaitForSeconds(Time.deltaTime);
                 Debug.Log("후딜레이 끝");
                 playerController.SetActiveState(PlayerController.eActiveState.DEFAULT);
                 animator.SetBool("isAttackOn", false);
-                SetActionParam(0);
+                
                 this.isAttackOn = false;
                 SetActionState(eActionState.NONE);
                 //this.isDelayCatchOn = false;
@@ -137,10 +168,13 @@ namespace Player.Modules
                 break;
             }
         }
+        public bool GetStateHitboxOn(){
+            return this.isHitboxOn;
+        }
         public void SetActionState(eActionState actionState){
             this.currentActionState = actionState;
         }
-        private void SetActionParam(int parameter)
+        public void SetActionParam(int parameter)
         {
             this.actionParam = parameter;
         }

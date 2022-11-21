@@ -6,16 +6,16 @@ using UnityEngine.UI;
 namespace Player.UI{
     public class HpBar : MonoBehaviour
     {
-        // Start is called before the first frame update
+        public Slider healthBar;
+        public BossController bossController;
+
         void Start()
         {
-            
+            bossController = GameObject.Find("boss").GetComponent<BossController>();
         }
-
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
-            
+            //healthBar.value = bossController.hp;
         }
     }
 }
