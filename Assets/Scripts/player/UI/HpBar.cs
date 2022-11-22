@@ -7,11 +7,11 @@ namespace Player.UI{
     public class HpBar : MonoBehaviour
     {
         public Slider healthBar;
-        public BossController bossController;
+        //public BossController bossController;
 
         void Start()
         {
-            bossController = GameObject.Find("boss").GetComponent<BossController>();
+            //bossController = GameObject.Find("boss").GetComponent<BossController>();
         }
         private void Update()
         {

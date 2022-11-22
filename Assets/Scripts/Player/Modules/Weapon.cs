@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Boss;
 namespace Player.Modules{
     public class Weapon : MonoBehaviour
     {

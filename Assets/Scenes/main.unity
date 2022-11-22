@@ -578,7 +578,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 201278507}
-  m_LocalRotation: {x: 0.00021502837, y: 0.99048465, z: -0.13761428, w: 0.0015476095}
+  m_LocalRotation: {x: 0.00021502511, y: 0.99048465, z: -0.13761428, w: 0.001547624}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1298,7 +1298,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &326156442
 Light:
   m_ObjectHideFlags: 0
@@ -1306,7 +1306,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 326156441}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -1392,7 +1392,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &333660397
 Light:
   m_ObjectHideFlags: 0
@@ -1400,7 +1400,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 333660396}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -1712,7 +1712,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &449534817
 Light:
   m_ObjectHideFlags: 0
@@ -1720,7 +1720,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 449534816}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -2136,7 +2136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &476127414
 Light:
   m_ObjectHideFlags: 0
@@ -2144,7 +2144,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 476127413}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -2974,7 +2974,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -4741,7 +4741,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1272594316}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -4752,7 +4752,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -5684,7 +5684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1588320357
 Light:
   m_ObjectHideFlags: 0
@@ -5692,7 +5692,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1588320356}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -6023,6 +6023,7 @@ GameObject:
   - component: {fileID: 1631120748}
   - component: {fileID: 1631120751}
   - component: {fileID: 1631120752}
+  - component: {fileID: 1631120754}
   - component: {fileID: 1631120753}
   m_Layer: 0
   m_Name: boss
@@ -6107,7 +6108,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1631120746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0131e582ed354458dd57dbc0298326, type: 3}
+  m_Script: {fileID: 11500000, guid: 21cc02c0e3a852e4689f60b9b9de5b6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bossBody: {fileID: 1631120749}
+  actionTime: 0
+  afterDelay: 0
+  currentState: 0
+  animator: {fileID: 0}
+--- !u!114 &1631120754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1631120746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: add8deb5b00481546a9b7190a0872e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 1000
@@ -6116,11 +6134,11 @@ MonoBehaviour:
   hpGauge: {fileID: 301923096}
   range: 0
   currentState: 0
-  playerTransform: {fileID: 1660762868}
-  runRange: 60
-  attackRange: 5
+  bossV: {x: 0, y: 0, z: 0}
+  player: {fileID: 1660762868}
+  runRange: 200
+  attackRange: 7
   percentage: 0
-  rushPct: 0
   walkRange: 10
   bossHealth: 100
   bossPower: 20
@@ -6129,6 +6147,7 @@ MonoBehaviour:
   attacktype: 0
   isLookAt: 0
   isToFollow: 0
+  bossAttack: {fileID: 0}
 --- !u!1 &1632092739 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c6ce797294808684eace53dd6b26b584, type: 3}
