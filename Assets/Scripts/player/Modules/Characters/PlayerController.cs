@@ -23,6 +23,7 @@ namespace Player.Modules.Characters
             DELAY_ROLL,
             ATTACK,
             DELAY_ATTACK,
+            TAKEDAMAGED
         };
         public enum eDelayState
         {
@@ -59,6 +60,16 @@ namespace Player.Modules.Characters
         public Vector3 joystickDirection;
         public Vector3 currentPosition;
         public Vector3 jumpDirection;
+        [Header("GameOver")]
+        public AudioClip audioDied;
+        public AudioClip audioDefated;
+        private AudioSource audioSource;
+        public fadein YouDied;
+        public fadein Defeated;
+        public CutsceneManager changer;
+        public bool isGameOver;
+
+
         void Start()
         {
             //playerCamera = GetComponent<Camera>();
@@ -69,15 +80,24 @@ namespace Player.Modules.Characters
             characterStatus = GetComponent<CharacterStatus>();
             ObjectDirection = Vector3.forward;
             PrimeDirection = Vector3.forward;
+            changer = GameObject.Find("SceneManager").GetComponent<CutsceneManager>();
+            audioSource = GetComponent<AudioSource>();
             // pivotPoint = playerCamera.transform.position;
         }
         void Update()
         {
-            debugRay();
-            Move();
-            AddGravity();
-            AttackFront();
-            LockOnTarget();
+            if (characterStatus.GetCurrentHealth() >= 0)
+            {
+                debugRay();
+                AddGravity();
+                if (GetActiveState() != eActiveState.TAKEDAMAGED)
+                {
+                    Move();
+                    AttackFront();
+                    LockOnTarget();
+                }
+            }
+        
         }
         private void Move()
         {
@@ -157,13 +177,6 @@ namespace Player.Modules.Characters
                 }
             }
         }
-
-
-
-
-
-
-
         //지역함수 , Getter Setter
         private float parseDot(float val)
         {
@@ -209,6 +222,53 @@ namespace Player.Modules.Characters
             Debug.DrawRay(playerBody.position, ObjectDirection, Color.red);
             Debug.DrawRay(playerBody.position, joystickDirection, Color.blue);
             Debug.DrawRay(playerBody.position, currentPosition, Color.green);
+        }
+        public void TakeDamaged()
+        {
+            if(characterStatus.GetCurrentHealth() <= 0f)
+            {
+                animator.SetTrigger("isDead");
+                StartCoroutine(GameOver(true));
+            }
+            if (characterStatus.GetCurrentHealth() >= 0f)
+            {
+                SetActiveState(eActiveState.TAKEDAMAGED);
+                if (GetActiveState() == eActiveState.TAKEDAMAGED)
+                {
+                    animator.SetTrigger("TakeDamage");
+                    StartCoroutine(DamagedAnimation());
+                }
+            }
+        }
+        IEnumerator DamagedAnimation()
+        {
+            
+            yield return new WaitForSeconds(2f);
+            if (characterStatus.GetCurrentHealth() >= 0)
+            {
+                animator.SetBool("Idle", true);
+                SetActiveState(eActiveState.DEFAULT);
+            }
+         }
+
+        IEnumerator GameOver(bool game)
+        {
+            Debug.Log("YouDied");
+            yield return new WaitForSeconds(1f);
+            if (game == true)
+            {
+                audioSource.clip = audioDied;
+                audioSource.Play();
+                YouDied.FadeFlow(true);
+            }
+            else
+            {
+                audioSource.clip = audioDefated;
+                audioSource.Play();
+                Defeated.FadeFlow(true);
+            }
+            yield return new WaitForSeconds(2f);
+            changer.FadeFlow(true);
         }
     }
 }

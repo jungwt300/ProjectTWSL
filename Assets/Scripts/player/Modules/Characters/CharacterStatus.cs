@@ -19,6 +19,9 @@ namespace Player.Modules.Characters
         public PlayerController playerController;
         private float stamina;
         private float health;
+        public AudioClip audioTakeDamaged;
+        AudioSource audioSource;
+        
         [SerializeField] Slider hpBar;
         [SerializeField] Slider staminaBar;
         void Awake()
@@ -31,6 +34,7 @@ namespace Player.Modules.Characters
             //max_stamina = 100.0f;
             stamina = max_stamina;
             //staminaIncrement = 0.1f;
+            audioSource = GetComponent<AudioSource>();
         }
         void Update()
         {
@@ -76,6 +80,8 @@ namespace Player.Modules.Characters
         }
         public void TakeDamage(float value)
         {
+            audioSource.clip = audioTakeDamaged;
+            audioSource.Play();
             this.health -= value;
         }
         public void HealHealth(float value)

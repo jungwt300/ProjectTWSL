@@ -10,7 +10,8 @@ namespace Boss
         Collider weaponFrom;
         public bool isDamageAvailable;
         private float recoverFrame = 15.0f;
-
+        public AudioClip audioTakeDamaged;
+        public AudioSource aSource;
         // Start is called before the first frame update
         void Start()
         {
@@ -25,6 +26,7 @@ namespace Boss
         }
         public void TakeDamage(int damage)
         {
+            aSource.Play();
             this.hp -= damage;
         }
         private void OnTriggerEnter(Collider other)

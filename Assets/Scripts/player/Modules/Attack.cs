@@ -17,6 +17,9 @@ namespace Player.Modules
         public float staminaUsage;
         public float afterDelay;    //후 딜레이
         public List<Animation> animations;
+        public AudioClip audioSwing;
+        AudioSource audioSource;
+
         [Header("Action State")]
         public eActionState currentActionState;
         bool isAfterDelayOn;
@@ -40,6 +43,7 @@ namespace Player.Modules
             characterController = GameObject.Find("player").GetComponent<CharacterController>();
             characterStatus = GameObject.Find("player").GetComponent<CharacterStatus>();
             rollSkill = GameObject.Find("player").GetComponent<Roll>();
+            audioSource = GetComponent<AudioSource>();
             //swordHitbox = GetComponent<Collider>();
             actionParam = 0;
             currentActionState = eActionState.NONE;
@@ -69,6 +73,7 @@ namespace Player.Modules
             }
         }
         public IEnumerator OnEnter(){
+            audioSource.clip = audioSwing;
             characterStatus.ReduceStamina(staminaUsage);
             animator.SetBool("isAttackOn",true);
             this.isAttackOn = true;
@@ -106,6 +111,7 @@ namespace Player.Modules
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
+            
             while (elapsedTime < move_secondDelay)
             {//선딜레이
                 characterController.Move(targetPosition);
@@ -114,6 +120,7 @@ namespace Player.Modules
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
+            audioSource.Play();
             isHitboxOn = true;
             //SetActionState(eActionState.DELAY_CASTING);
             yield return new WaitForSeconds(this.duration);
