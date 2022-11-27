@@ -13,7 +13,9 @@ namespace Boss
         public float recoveryStamina = 1f;
         public Slider hpGauge;
         public AudioClip audioTakeDamaged;
+        public AudioClip audioDefeated;
         public AudioSource aSource;
+        bool bossDead = false;
         public enum CurrentState
         {
             IDLE,       //사거리에 player가 없는 상태
@@ -55,6 +57,8 @@ namespace Boss
         public BossAttack bossAttack;
         // eActiveState playerActive;
         public CameraShake cameraShake;
+        public fadein1 defeated;
+        public CutsceneManager changer;
 
         // Start is called before the first frame update
         void Start()
@@ -72,12 +76,17 @@ namespace Boss
             animator = GetComponentInChildren<Animator>();
             bossAttack = GameObject.Find("boss").GetComponent<BossAttack>();
             aSource = GetComponent<AudioSource>();
+            defeated = GameObject.Find("Defeated").GetComponent<fadein1>();
+            changer = GameObject.Find("SceneManager").GetComponent<CutsceneManager>();
+
+            // fadein1.isFadeIn = false;
+
             //player 
             // playerActive = GameObject.Find("player").GetComponent<eActiveState>();
 
-            StartCoroutine(this.CheckState());
-            StartCoroutine(this.CheckStateForAction());
-            StartCoroutine("CountTime", 1);
+                StartCoroutine(this.CheckState());
+                StartCoroutine(this.CheckStateForAction());
+                StartCoroutine("CountTime", 1);
         }
         void Update()
         {
@@ -99,6 +108,10 @@ namespace Boss
                 navMeshAgent.destination = player.position;
                 // animator.SetBool("isIDLE", true);
             }
+            else
+            {
+                navMeshAgent.destination = boss.position;
+            }
             // FollowTarget();
             // LookAt();
             // if (range >= attackRange && range <= walkRange)
@@ -114,34 +127,53 @@ namespace Boss
                 //cameraShake.Shake();    //흔들리는 이팩트
             }
 
-            if (Input.GetKeyDown(KeyCode.L))
+            if (Input.GetKeyDown(KeyCode.F9))
             {
                 ReduceHp(999);
             }
-            IsBossdead();
+            // IsBossdead();
+
         }
         public void ReduceHp(int damage)
         {
             aSource.clip = audioTakeDamaged;
             aSource.Play();
             this.hp -= damage;
+            IsBossdead();
+
         }
 
         public void IsBossdead()
         {
-            if (hp <= 0)
+
+            if (hp <= 0 && bossDead == false)
             {
-                // currentState = CurrentState.DEAD;
+                bossDead = true;
+                currentState = CurrentState.DEAD;
                 isDead = true;
                 isLookAt = false;
                 isToFollow = false;
+                // defeated.FadeFlow(true);
+                animator.SetBool("isDEAD", true);
                 animator.SetBool("isWALK", false);
                 animator.SetBool("isRUN", false);
                 animator.SetBool("isATTACK", false);
-                animator.SetBool("isIDLE", true);
-                Debug.Log("Boss = DEAD");
-
+                animator.SetBool("isIDLE", false);
+                // Debug.Log("Boss = DEAD");
+                StartCoroutine(IsBossdeadScene());
+                changer.nextScene = "Start";
+                changer.bgmOff = true;
             }
+        }
+        IEnumerator IsBossdeadScene()
+        {
+            yield return new WaitForSeconds(1.0f);
+            aSource.clip = audioDefeated;
+            yield return new WaitForSeconds(1.0f);
+            defeated.FadeFlow(true);
+            aSource.Play();
+            yield return new WaitForSeconds(5.0f);
+            changer.FadeFlow(true);
         }
         IEnumerator CheckState()        //boss의 조건
         {
@@ -170,6 +202,11 @@ namespace Boss
                 {
                     currentState = CurrentState.RUN;
                     // Debug.Log("Boss = RUN");
+                }
+                else if (hp <= 0)
+                {
+                    currentState = CurrentState.DEAD;
+                    // Debug.Log("Boss = DEAD");
                 }
                 else
                 {
@@ -215,7 +252,9 @@ namespace Boss
 
                     case CurrentState.DEAD:
                         IsBossdead();
-                        // Debug.Log("Boss = DEAD");
+                        yield return new WaitForSeconds(2f);
+                        changer.FadeFlow(true);
+                        Debug.Log("Boss = DEAD");
                         break;
                 }
 
@@ -226,29 +265,33 @@ namespace Boss
         }
         IEnumerator CountTime(float delayTime)  //ATTACK 확률 계산
         {
-            int rndPercentage = Random.Range(1, 10);     //1~9 더함
-
-            if (percentage >= 10 && range <= attackRange)   //percentage 가 10 이상, 거리가 7안에 있으면
+            if (isDead != true)
             {
-                percentage = 0;
+                int rndPercentage = Random.Range(1, 10);     //1~9 더함
 
-                if (percentage == 0 && currentState == CurrentState.WALK || percentage == 0 && currentState == CurrentState.WALKAROUND)   //percentage == 0, boss가 WALK 상태일 때
+
+                if (percentage >= 10 && range <= attackRange)   //percentage 가 10 이상, 거리가 7안에 있으면
                 {
-                    isAttack();
-                    currentState = CurrentState.ATTACK;
-                    // yield return new WaitForSeconds(1.0f);
+                    percentage = 0;
+
+                    if (percentage == 0 && currentState == CurrentState.WALK || percentage == 0 && currentState == CurrentState.WALKAROUND)   //percentage == 0, boss가 WALK 상태일 때
+                    {
+                        isAttack();
+                        currentState = CurrentState.ATTACK;
+                        // yield return new WaitForSeconds(1.0f);
+                    }
                 }
-            }
 
-            // Debug.Log("Time : " + Time.time);
-            // Debug.Log("Percentage : " + percentage + "0 % ");
-            if (currentState == CurrentState.WALK || currentState == CurrentState.WALKAROUND) //player 가 attackRange 안에 있을때만 올라감
-            {
-                percentage += rndPercentage;        //percentage = percentage + rndPercentage;
+                // Debug.Log("Time : " + Time.time);
+                // Debug.Log("Percentage : " + percentage + "0 % ");
+                if (currentState == CurrentState.WALK || currentState == CurrentState.WALKAROUND) //player 가 attackRange 안에 있을때만 올라감
+                {
+                    percentage += rndPercentage;        //percentage = percentage + rndPercentage;
 
+                }
+                yield return new WaitForSeconds(delayTime);
+                StartCoroutine("CountTime", 1);
             }
-            yield return new WaitForSeconds(delayTime);
-            StartCoroutine("CountTime", 1);
         }
         public void LookAt()
         {

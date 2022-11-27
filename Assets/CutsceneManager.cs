@@ -7,14 +7,17 @@ using UnityEngine.SceneManagement;
 
 public class CutsceneManager : MonoBehaviour
 {
+    AudioSource bgm;
     public Image blackBoard;
     public bool isFadeIn = false;
     public string nextScene;
     float time = 0f;
     float f_time = 2f;
+    public bool bgmOff;
     private void Start()
     {
         StartCoroutine(FadeOut());
+        bgm = GetComponent<AudioSource>();
     }
     void Update()
     {
@@ -22,6 +25,10 @@ public class CutsceneManager : MonoBehaviour
         {
             StartCoroutine(FadeIn());
             isFadeIn = false;
+        }
+        if(bgmOff == true)
+        {
+            bgm.volume -= 0.1f * Time.deltaTime;
         }
     }
     public IEnumerator FadeIn()

@@ -2498,6 +2498,7 @@ MonoBehaviour:
   blackBoard: {fileID: 645758713}
   isFadeIn: 0
   nextScene: StartGame 1
+  bgmOff: 0
 --- !u!4 &984553022
 Transform:
   m_ObjectHideFlags: 0

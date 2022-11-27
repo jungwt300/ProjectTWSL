@@ -57,12 +57,19 @@ namespace Player.Modules.Characters
                 }
                 
             }
+            // health += 1;
         }
 
         private void recoveryStamina(float staminaIncrement)
         {
             this.stamina += staminaIncrement;
             stamina = Mathf.Clamp(stamina, -100f, max_stamina);
+            if ( health >= 0)
+            {
+                health += 0.05f;
+                health = Mathf.Clamp(health, 0f, max_health);
+            }
+            
         }
         //getter setter
         ///HP 관련
