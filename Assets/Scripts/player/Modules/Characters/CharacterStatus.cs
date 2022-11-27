@@ -62,11 +62,11 @@ namespace Player.Modules.Characters
 
         private void recoveryStamina(float staminaIncrement)
         {
-            this.stamina += staminaIncrement;
+            this.stamina += staminaIncrement * Time.deltaTime;
             stamina = Mathf.Clamp(stamina, -100f, max_stamina);
             if ( health >= 0)
             {
-                health += 0.05f;
+                health += 0.8f * Time.deltaTime;
                 health = Mathf.Clamp(health, 0f, max_health);
             }
             
